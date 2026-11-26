@@ -1,0 +1,9 @@
+﻿# Ignore everything
+*
+
+# Un-ignore these folders and files
+!.gitignore
+!Proj Des/
+!Proj Des/**
+!Resumes/
+!Resumes/**

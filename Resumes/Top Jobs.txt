@@ -1,0 +1,175 @@
+Here is a batch of ByteDance JDs. Score each one from 1 to 10 based strictly on how well they match my resume (attached PDF), an Applied ML Engineer who specializes in high-concurrency Python ETL data pipelines, Hugging Face Accelerate distributed training, and NLP tokenization/ablation studies.
+
+Penalize heavily for pure Product Management (PM), Java/Hadoop Big Data, or low-level C++/CUDA Infra roles.
+Output only the Top 3 roles from this batch, including their ID and a 1-sentence reason why they are a lethal match."
+
+1. 推荐大模型训练/推理优化实习生 - 抖音/直播/电商/剪映
+ID: 7595244608418842933
+
+Score: 9.9/10
+
+
+Lethal Match: This role is a direct application of your research using Hugging Face Accelerate, fp16, and gradient accumulation to optimize large-scale distributed training and inference architectures.
+
+
+1. Role ID: 7605872328216283445 (大模型应用算法实习生 - 内容消费与非闭环电商)
+
+Score: 9.9/10
+
+
+Lethal Match Reason: This position perfectly bridges your professional experience in building high-volume Python data pipelines with your research expertise in LLM post-training (SFT/RL) and Agent architectures.
+
+
+1. 后端开发实习生（AI电商）- TikTok Shop (ID: 7591509153127844149)
+Why it's a lethal match: This is a rare "Full-Stack MLE" role that explicitly asks for "大规模样本数据的管理、预处理、存储" (Large-scale sample data management/ETL) and "大模型、AIGC服务链路" (LLM/AIGC service chains). Your HealthHope high-concurrency pipeline experience is the exact "infrastructure" they need to feed their TikTok Shop AI workflows.
+(Score: 9.8/10)
+
+2. Role ID: 7613277020009335093 (AI训推优化实习生 - 算力与AI基础设施)
+
+Score: 9.8/10
+
+
+Lethal Match Reason: This role is the industrial equivalent of your Dartmouth research, specifically seeking your skills in Hugging Face Accelerate, distributed training throughput optimization, and gradient/mixed-precision hyperparameter tuning.
+
+1. 推荐大模型算法实习生 - 国际电商Job ID: 7615464020854065461
+Lethal Match Reason: This role is an exact mirror of your Dartmouth research, requiring expertise in LLM Scaling Laws, tokenization (addressing OOV/semantic tokens), and pre-training/post-training architectures which you mastered using ALBERT and SentencePiece.
+
+Score: 9.8/10
+
+1. 大模型应用算法实习生 - Data AML
+ID: 7605860648382171397
+
+Score: 9.8/10
+
+
+Lethal Match Reason: This role perfectly bridges your Python data engineering experience with your LLM optimization research by focusing on context engineering, data synthesis, and RAG architectures that require the exact high-throughput processing and model-tuning skills you've developed.
+
+2. 推荐大模型算法实习生 - 国际电商
+ID: 7600610490637289781
+
+Score: 9.8/10
+
+
+Lethal Match: It perfectly aligns with your Dartmouth research on BERT/ALBERT architectures, specifically regarding semantic tokenization (addressing OOV issues) and investigating pre-training objectives through rigorous ablation studies.
+
+
+####################################
+[
+    {
+        "title": "推荐大模型训练/推理优化实习生Data-抖音/直播/电商/剪映",
+        "responsibilities": "1、完成LLM训练/推理技术在推荐大模型场景的研发、落地和调优，解决推荐场景的大模型工程问题；\n2、针对PyTorch、TensorFlow等框架提供高自动化、极致性能的模型优化方案；\n3、推动基于大模型开源组件构建，设计和实现新一代推荐系统架构，支持推荐大模型在业务落地；\n4、与算法团队Co-Design，推动端到端生成式推荐技术创新的预研和落地。",
+        "requirements": "1、2027届本科及以上学历在读，计算机、软件工程、网络工程等相关专业优先；\n2、扎实的编程和算法基础，熟练掌握C/C++、Python、Java等编程语言，有CUDA开发经验，熟悉TensorRT/Triton/Cutlass经验者优先；\n3、熟悉大模型推理加速的研究和技术进展，包括但不限于模型量化、图编译、算子调优、KVCache、PD分离等；\n4、掌握LLM训练/推理技术，有实际开发和应用落地经验，例如Megatron、DeepSpeed、vLLM、SGLang、TRT-LLM等；\n5、对大模型工程有丰富的经验和广阔视野，紧追开源动态，具备独立的Trouble-shooting能力。",
+        "link": "https://jobs.bytedance.com/campus/position/7595244608418842933/detail"
+    },
+    {
+        "title": "大模型应用算法实习生-内容消费与非闭环电商",
+        "responsibilities": "1、构建高质量短剧和游戏，多模态推理和细粒度数据集，通过数据合成技术，不断优化数据质量和丰富度，沉淀短剧和游戏行业的高价值信息；\n2、针对业务需求对内容消费行业多模态大模型进行后训练，包括CPT、SFT、RLVR、多轮Agent RL，提升模型能力；\n3、结合业务场景设计搭建Agent架构，探索Agent Test-Time-Scaling技术；\n4、通过大模型不断优化针对短剧和游戏内容的理解和生成能力，包括：视频内容理解、用户兴趣挖掘、漫剧内容生产、引流视频剪辑和游戏Agent/AI Coding等。",
+        "requirements": "1、2027届本科及以上学历在读，计算机、机器学习等相关专业优先；\n2、在NLP算法、多模态算法、大模型训练和应用、知识图谱等领域有实际的开发经验者优先；\n3、思维开阔、具备优秀的逻辑思考能力，面对挑战性问题充满热情，具有良好的团队合作能力、沟通协调能力，执行力和自驱力强；\n4、学习能力强，对AI前沿技术持续关注，能够洞察技术和业务的结合点。",
+        "link": "https://jobs.bytedance.com/campus/position/7605872328216283445/detail"
+    },
+    {
+        "title": "大模型应用算法实习生-Data AML",
+        "responsibilities": "1、打造行业领先的大模型Context Engineering产品，包含向量库/知识库/记忆库等原子产品优化，在Agent Memory/参数化压缩/多模态/自进化等方向，通过模型侧优化创新提升产品竞争力；\n2、探索行业领先的AI搜索/AI推荐/AI问答产品；推进数据合成；模型后训练等方案，提高模型通用能力和业务场景表现；\n3、跟进学术界和工业界大模型相关技术进展，聚焦模型和底层创新，探索相关技术在业务应用。",
+        "requirements": "1、2027届本科及以上学历在读，计算机、人工智能等相关专业优先；\n2、掌握C/C++/Python等编程技能，有扎实的编程基础、良好的编程风格和工作习惯；\n3、熟悉深度学习算法（CNN/RNN/LSTM/RL/推荐广告的大规模Sparse&Dense模型等）；\n4、自驱力强，愿意接受挑战；\n5、具有独立解决问题的能力，良好的团队合作意识和沟通能力。",
+        "link": "https://jobs.bytedance.com/campus/position/7605860648382171397/detail"
+    },
+    {
+        "title": "后端开发实习生（AI电商）-TikTok Shop",
+        "responsibilities": "1、负责大模型、AIGC服务链路和应用平台的开发，支撑相关业务的生产与高效迭代；\n2、设计和实现机器学习相关的基础设施、框架、工具链等，并推动落地到业务中；\n3、负责大规模样本数据的管理、标注、预处理、存储等能力建设，提供训练和推理使用的基础设施保障；\n4、构建适合电商场景的AI应用Workflow编排框架和平台，方便电商各业务搭建AI应用链路；\n5、负责电商GPU资源管理和优化调度，并建设管理工具平台，优化GPU管理效率，提升资源池整体利用率；\n6、探索业界前沿的深度学习相关技术，持续提升平台能力、降低研发与算法的使用成本。",
+        "requirements": "1、2027届本科及以上学历在读，计算机、软件工程、人工智能等相关专业优先；\n2、对语言LLM/VLM/AIGC等多种模型、智能代理Agent技术、RAG技术、AutoPrompt技术有一定的了解或使用经验；\n3、熟练掌握算法、数据结构等基础知识；\n4、至少熟练使用一门编程语言（C/C++/Python/Go等）；\n5、积极乐观，责任心强，工作认真细致，具有良好的团队沟通与协作能力；\n6、热爱编程，有较强的学习能力，有强烈的求知欲、好奇心和进取心，能及时关注和学习业界最新技术；每周可实习4天及以上，实习时长3个月及以上优先。",
+        "link": "https://jobs.bytedance.com/campus/position/7591509153127844149/detail"
+    },
+    {
+        "title": "AI训推优化实习生-算力与AI基础设施",
+        "responsibilities": "1、参与构建AI Infra性能Benchmark体系，设计量化性能标尺与竞争力评估模型，实现算力资源的精准度量与效能评估；\n2、参与LLM/VLM/AIGC模型训练/推理优化，开展底层技术栈的性能剖析与代码级优化，提升模型的训练吞吐量与推理响应速度，优化资源占用效率。",
+        "requirements": "1、2027届本科及以上学历在读，计算机、软件工程、电子信息等相关专业优先；\n2、掌握C/C++、Python、Go中至少一种编程语言，具备课程设计、科研项目或开源项目的开发与调试实践经验，能够清晰阐述技术实现思路与问题解决过程；\n3、了解LLM/VLM/AIGC等AI领域的基础原理与典型模型架构，在学术研究、竞赛或课程学习中接触过相关模型，具备探究其运行机制的技术好奇心；\n4、有PyTorch等主流深度学习框架的使用经验，参与过模型训练、参数调优或框架组件的二次开发（如模型代码修改、训练流程优化等）；\n5、对异构计算、网络传输或存储IO的性能分析具备理论基础与研究兴趣，有意愿深入钻研性能分析工具的原理与优化方法。\n\n加分项：\n1、在学术论文、课程设计中涉及AI系统性能分析相关研究，如模型训练瓶颈定位、计算资源调度优化等；\n2、有开源社区贡献经历，参与过AI框架或性能优化工具的代码提交与维护；\n3、基于PyTorch等框架完成过模型训练/推理项目，并实施过速度优化或资源占用率改进措施；\n4、接触过模型量化、精度校准等技术，在课程实验或项目中实践过相关调优方法；\n5、具备TensorRT/CUTLASS/Trition等工具的学习或使用经历，理解其性能加速原理。",
+        "link": "https://jobs.bytedance.com/campus/position/7613277020009335093/detail"
+    },
+    {
+        "title": "推荐大模型算法实习生-国际电商",
+        "responsibilities": "1、推荐模型的Scaling Law，模型在理论指导下Scaling Up，涉及到算力在数据、参数和推理上最优分配；\n2、以开源LLM为基座，把推荐物品的语义Token和世界知识进行模态融合；\n3、以NTP为主的Pre-Train和把推荐重构为RLVR任务的Post-Train，探索Reasoning及蒸馏上线的潜力；\n4、单体模型充分Scaling Up及端到端生成式推荐探索。",
+        "requirements": "1、2027届本科以上学历在读，计算机、软件工程等相关专业优先；\n2、具有扎实的机器学习基础和编码能力，在机器学习、NLP、CV等有较深入的研究经验，熟练掌握主要的算法和数据结构；\n3、在搜广告推和大模型领域，有参与或者主导过关键项目的优先；\n4、在国际顶级会议发表论文者优先，包括但不限于KDD、SIGIR、RecSys、ACL、NeurIPS等；\n5、具备较好的问题分析和解决能力，对LLM相关技术有热情，热衷于推动和解决在推荐业务落地中遇到的各种挑战。",
+        "link": "https://jobs.bytedance.com/campus/position/7615464020854065461/detail"
+    },
+    {
+        "title": "推荐大模型算法实习生-国际电商",
+        "responsibilities": "1、推荐模型的Scaling Law，模型在理论指导下Scaling Up，涉及到算力在数据、参数和推理上最优分配；\n2、以开源LLM为基座，把推荐物品的语义Token和世界知识进行模态融合；\n3、以NTP为主的Pre-Train和把推荐重构为RLVR任务的Post-Train，探索Reasoning及蒸馏上线的潜力；\n4、单体模型充分Scaling Up及端到端生成式推荐探索。",
+        "requirements": "1、2027届本科及以上学历在读，计算机、软件工程等相关专业优先；\n2、具有扎实的机器学习基础和编码能力，在机器学习、NLP、CV等有较深入的研究经验，熟练掌握主要的算法和数据结构；\n3、在搜广告推和大模型领域，有参与或者主导过关键项目的优先；\n4、在国际顶级会议发表论文者优先，包括但不限于KDD、SIGIR、RecSys、ACL、NeurIPS等；\n5、具备较好的问题分析和解决能力，对LLM相关技术有热情，热衷于推动和解决在推荐业务落地中遇到的各种挑战。",
+        "link": "https://jobs.bytedance.com/campus/position/7600610490637289781/detail"
+    },
+]
+####################################
+
+
+2. 大数据开发实习生-AIDP (ID: 7605138439188990261)
+Why it's a lethal match: Don't let the "Big Data" title fool you—this is Seed 大模型数据全生命周期 (The data lifecycle for the Seed LLM). They need high-throughput processing for 日PB级数据 (PB-level data per day) to support SFT/RLHF. Your ability to architect multi-threaded scrapers and clean complex corpora is the core requirement for this team.
+(Score: 9.4/10)
+
+3. 大模型算法实习生（多轨道剪辑Agent方向）- 剪映 (ID: 7606260876275190069)
+Why it's a lethal match: This role focuses on "多轨道时序理解" (Multi-track temporal understanding) and "指令微调、偏好对齐" (SFT/RLHF). Your Dartmouth research on custom tokenizers and empirical ablation studies makes you a 10/10 fit for a team trying to solve the "Empirical Hard" problem of making an Agent understand video, audio, and text simultaneously.
+(Score: 9.1/10)
+
+1. (Score: 9.5/10) 大模型算法实习生-TikTok Shop (ID: 7615539722026780981)
+Reason: This is the most comprehensive fit as it combines NLP foundation model pre-training with a specific need to optimize data-to-inference workflows, directly leveraging your tokenization and distributed training experience.
+
+2. (Score: 9.2/10) 大模型算法实习生（AI Coding）- 剪映数据与智能团队 (ID: 7611180413277669685)
+Reason: This role focuses intensely on high-quality data mining/synthesis for model training and RLHF alignment, which is an exact 1:1 mapping for your high-concurrency ETL and empirical ablation study skills.
+
+3. (Score: 9.7/10) 后端开发实习生-Cross Platform (ID: 7592131172177873205) 
+Reason: This provides a dedicated engineering battleground for your specific expertise in high-concurrency scraping solutions and the architectural design required for massive-scale AI data extraction.
+
+
+
+2. 机器学习研发实习生 - Ads CoreJob ID: 7610363926468315445Lethal Match Reason: It leverages your dual strengths by requiring high-concurrency/low-latency system architecture skills (similar to your ETL work ) and distributed training optimization for large-scale ML models using PyTorch.Score: 9.6/10
+
+3. 广告大模型训练推理实习生 - 广告架构与工程Job ID: 7613036830926113077Lethal Match Reason: This position focuses on distributed training acceleration and PyTorch framework optimization, directly utilizing your experience with Hugging Face Accelerate, mixed precision (fp16), and gradient accumulation.Score: 9.5/10
+
+
+2. 内容理解算法实习生 - 抖音
+ID: 7595624317544401205
+
+Score: 9.7/10
+
+
+Lethal Match Reason: This position leverages your specific research on BERT/ALBERT architectures and SentencePiece tokenization to solve large-scale multi-modal content understanding challenges using the Python-based ML frameworks you have mastered.
+
+3. 后端研发实习生（风控合规方向）- 国际支付
+ID: 7605174494564370693
+
+Score: 9.5/10
+
+
+Lethal Match Reason: This role is the ideal application for your high-concurrency Python ETL skills , as it explicitly requires the integration of LLM technologies into massive, low-latency backend systems to automate complex payment risk and auditing workflows.
+
+
+
+3. 豆包大模型算法实习生（互动娱乐）- 火山方舟
+ID: 7600981621741783301
+
+Score: 9.6/10
+
+
+Lethal Match: This position leverages your dual strengths in high-concurrency Python ETL for data synthesis and screening alongside your expertise in post-training iteration and model performance analysis.
+
+1. 后端研发实习生（风控合规方向）- 国际支付
+Job ID: 7605174494579820853
+Reason: This role is a perfect marriage of your high-concurrency Python backend engineering background and your recent research focus on integrating LLMs into complex system architectures for performance tuning and automated decision-making.
+
+Score: 9.7/10
+
+2. 算法实习生 - 抖音平台产品Job ID: 7603264808588036357Reason: This position utilizes your complete Applied ML toolkit, specifically calling for the data synthesis skills you mastered in ETL pipelines and the Hugging Face Accelerate/Fine-tuning expertise demonstrated in your ALBERT pre-training research.
+
+Score: 9.5/10
+
+3. 搜索算法实习生 - 国际电商Job ID: 7600332025157765429Reason: This role directly targets your specialized research in SentencePiece/Unigram tokenization and ablation studies , tasking you with solving OOV (Out-of-Vocabulary) and cross-lingual matching challenges in massive multi-language search environments.
+
+Score: 9.4/10
+
+
+
+3. Role ID: 7595873157535320373 (后端开发实习生 - 中国交易与广告)
+
+Score: 9.5/10
+
+
+Lethal Match Reason: It uniquely combines your background in high-concurrency Python backend development and API architecture with your academic focus on large-scale model stability and continuous delivery for recommendation systems.

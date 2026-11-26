@@ -1,0 +1,1883 @@
+This is a rough overview of the project for your reference:
+"Comprehensive Description of My Research
+1️⃣ Research Motivation
+
+The central motivation of this project is to understand how linguistic structure in pretraining data influences representation learning and cross-lingual generalization in transformer-based language models.
+
+Large language models are often evaluated on downstream performance, but performance alone does not tell us what the model has learned. We are interested in whether models internalize abstract structural regularities of language, or whether they primarily capture surface-level statistical co-occurrence patterns tied to the training distribution.
+
+This distinction becomes particularly visible when we examine cross-lingual transfer.
+
+2️⃣ Core Research Question
+
+Our guiding question is:
+
+How does the structural nature of a pretraining language influence downstream task performance and cross-lingual transfer ability?
+
+More specifically:
+
+Do structurally similar languages produce representations that align more easily?
+Does structural distance increase the need for fine-tuning adaptation?
+Are learned representations abstract enough to generalize across linguistic systems?
+3️⃣ Hypothesis
+
+We hypothesize that:
+
+Languages with closer structural properties (e.g., morphology, syntax, tokenization granularity) will produce representations that align more easily in embedding space.
+These aligned representations will result in stronger cross-lingual transfer performance.
+Structurally distant languages will require greater task-specific adaptation during fine-tuning.
+
+This suggests that structural similarity contributes to transferable abstraction beyond simple lexical overlap.
+
+4️⃣ Experimental Design Overview
+
+The study consists of three major stages:
+
+A. Pretraining
+B. Fine-tuning
+C. Downstream Evaluation
+
+Each stage is designed to isolate structural effects while controlling for confounders.
+
+5️⃣ Pretraining Stage
+
+We train transformer-based models using a BERT-style objective:
+
+Masked Language Modeling (MLM)
+Next Sentence Prediction (NSP)
+Why MLM?
+
+MLM enables bidirectional contextual representation learning, which is suitable for classification and syntactic evaluation tasks.
+
+Controlled Variables
+
+To isolate the impact of language structure, we control:
+
+Model architecture (layers, hidden size, attention heads)
+Optimization parameters (learning rate, batch size, training steps)
+Vocabulary size
+Tokenizer algorithm and hyperparameters
+Total token count during training
+
+We control token count, not raw file size, since token count determines effective training signal.
+
+The only independent variable is the pretraining corpus language.
+
+6️⃣ Tokenization Considerations
+
+Tokenization significantly affects representation learning:
+
+Vocabulary granularity changes sequence length.
+Subword segmentation affects semantic composition.
+Cross-lingual overlap may influence transfer.
+
+To reduce confounding, we standardize:
+
+Vocabulary size
+Tokenizer training procedure
+
+We acknowledge that tokenizer behavior remains a potential source of variation and interpret results cautiously.
+
+7️⃣ Handling Confounders
+
+Ideally, we would control for:
+
+Corpus size
+Domain distribution
+Topic diversity
+Lexical frequency patterns
+
+Perfectly matched corpora across languages are difficult to obtain.
+
+Because our evaluation focuses primarily on syntactic and structural tasks rather than factual recall, we expect topic variation to have limited influence. However, we acknowledge domain distribution as a potential confounder and treat conclusions accordingly.
+
+This limitation is explicitly recognized in our design.
+
+8️⃣ Fine-Tuning Stage
+
+Fine-tuning adapts pretrained representations to specific supervised tasks.
+
+We evaluate two scenarios:
+
+Same-Language Fine-Tuning
+
+Measures within-language generalization.
+
+Cross-Lingual Fine-Tuning
+
+Pretrain in Language A → Fine-tune in Language B.
+
+This tests whether learned representations transfer across linguistic systems.
+
+9️⃣ What Transfer Performance Means
+
+Transfer performance measures:
+
+The extent to which structural features learned during pretraining generalize across linguistic distributions when applied to downstream tasks in another language.
+
+It reflects representation alignment, not merely surface similarity.
+
+Strong transfer suggests abstraction.
+Weak transfer suggests distribution dependence.
+
+🔟 Downstream Evaluation
+
+We evaluate models on multiple structural dimensions:
+
+Classification Tasks
+Accuracy
+Precision
+Recall
+F1-score (especially under imbalance)
+Syntactic Tasks
+POS tagging accuracy
+Dependency parsing metrics
+Semantic Tasks
+Similarity measures
+Retrieval metrics
+
+We do not focus on generative tasks, as they introduce additional evaluation complexity unrelated to structural abstraction.
+
+1️⃣1️⃣ Statistical Validation
+
+To ensure robustness:
+
+We run multiple training seeds.
+Report mean performance and standard deviation.
+Compare models across identical splits.
+Avoid overlap between pretraining and downstream labeled data.
+Ensure no cross-lingual data leakage.
+
+This reduces variance-driven misinterpretation.
+
+Where appropriate, statistical testing can be used to verify significance.
+
+1️⃣2️⃣ Conceptual Contribution
+
+This research helps disentangle:
+
+Whether transformer models learn abstract linguistic structure
+Or whether performance depends heavily on corpus-specific statistical patterns
+
+It contributes to understanding:
+
+Inductive bias in representation learning
+Cross-lingual transfer theory
+Distributional generalization
+1️⃣3️⃣ Practical Challenges
+
+Common implementation issues include:
+
+GPU memory constraints
+Training instability
+Random seed sensitivity
+Tokenizer misalignment
+Library version conflicts
+Reproducibility tracking
+
+We mitigate these with fixed seeds, checkpointing, and consistent environment control.
+
+1️⃣4️⃣ Limitations
+
+We explicitly acknowledge:
+
+Imperfect corpus domain matching
+Tokenizer-induced variation
+Computational constraints limiting scale
+
+We interpret results within these boundaries.
+
+1️⃣5️⃣ If Asked “What Have You Learned Personally?”
+
+You can say:
+
+This project made me much more attentive to experimental controls and evaluation design. It reinforced that performance metrics alone are insufficient without careful isolation of variables and reproducibility safeguards.
+
+That signals maturity.
+
+1️⃣6️⃣ The 20-Second Executive Summary
+
+If interrupted and asked to summarize:
+
+We train structurally controlled transformer models on different linguistic systems while holding architecture and optimization constant. We then evaluate how language structure influences downstream performance and cross-lingual transfer, with attention to representation alignment and generalization. The goal is to understand whether models internalize abstract structural regularities or remain tied to surface-level statistical patterns."
+
+This is the resume description of my LLM research, I will need to be able to defend everything on it:
+Minds, Machines, and Society 研究组，达特茅斯学院
+大语言模型(LLM) 预训练架构与跨语言优化研究
+2025 年 9 月– 至今
+美国，汉诺威
+• 主导基于ALBERT架构的大模型预训练流水线开发，利用HuggingFaceAccelerate 实现分布式训练，结合混合精度
+(fp16) 与梯度累加技术，在显存受限环境下模拟2048 超大有效批次(Effective Batch Size)，显著提升训练吞吐量。
+• 面向跨语言场景，从零构建并训练基于SentencePiece Unigram 的定制化分词器 (Tokenizer)，动态清洗与处理超 9GB
+多语言语料库；通过优化词表大小(VocabSize) 解决文言文等复杂系统中的OOV(Out-of-Vocabulary) 难题，为模型
+构建高质量底层训练数据集。
+• 设计并执行严谨的消融实验(Ablation Studies)，精细控制模型参数与优化器设置，深入对比 MLM（掩码语言模型）与
+NSP/SOP 等预训练目标，系统验证不同策略对跨语言特征提取及下游情感分析任务泛化能力的影响。
+• 搭建TensorBoard 监控体系，实时追踪预训练收敛曲线与梯度范数(Gradient Norms)，针对大规模数据跑批中的学习
+率(3×10^−4) 进行超参数调优，系统性排查并解决模型Loss停滞(Plateau) 问题，保障全链路训练稳定性。
+
+The following is a detailed code of my pre-training / tokenizer pipeline:
+
+albert_sentencepiece_unigram_english_fulldata_tokenizertrain.py
+# The following code works. 
+# Specific for test purposes to tune hyperparameters and debugging.
+# Tuned down to a small dataset for fast iteration.
+# It uses 6000 vocab size SentencePiece Unigram tokenizer
+# to pretrain an ALBERT model on a small 0.15GB English Wikipedia
+
+# %%
+# Import all the necessary libraries
+import torch
+import multiprocessing
+from tqdm import tqdm
+from datasets import load_dataset
+from transformers import AutoTokenizer
+
+# Create a generator to dynamically load text data in chunks
+def batch_iterator(dataset,batch_size=10000):
+    for i in tqdm(range(0, len(dataset), batch_size)):
+        yield dataset[i: i + batch_size]["text"]
+
+# Define a tokenization function
+def tokenize_text(examples, tokenizer=None):
+    return tokenizer(
+        examples["text"], # Extract 'text' column from dataset
+        return_special_tokens_mask=True, # Required for special pretraining task, returns an additional arr for special tokens such as MASK or SEP.
+        truncation=True, # Tell the tokenizer to cut off texts longer than max_length
+        padding=False, # No padding here
+        max_length=512 # specifies the max length
+    )
+
+# AI 真的太好用了你们知道吗
+def select_subset_by_size(dataset, target_size_bytes):
+    total_bytes = 0
+    selected_indices = []
+
+    print(f"Selecting ~{target_size_bytes / (1024**3):.2f} GB of raw text...")
+
+    # Iterate through dataset and accumulate text size
+    for idx, text in tqdm(enumerate(dataset["text"]), total=len(dataset)):
+        total_bytes += len(text.encode("utf-8"))
+        selected_indices.append(idx)
+
+        if total_bytes >= target_size_bytes:
+            break
+
+    print(f"Selected {len(selected_indices)} samples "
+          f"({total_bytes / (1024**3):.3f} GB).")
+
+    return dataset.select(selected_indices)
+
+# %%
+
+######## === Select SIZE GB of raw text ===########
+DATA_SIZE_GB = 9
+###################################################
+
+print("================== Stage 1: Starting Dataset Preparation ==================")
+
+# Load dataset
+print("Loading datasets...")
+# bookcorpus = load_dataset("bookcorpus", split="train")
+wiki = load_dataset('wikipedia', '20220301.en', split='train', trust_remote_code=True)
+print("Datasets loaded.")
+
+# Clean wiki dataset to keep only text col
+print("Cleaning wiki dataset...")
+wiki = wiki.remove_columns([col for col in wiki.column_names if col != 'text'])
+print("Wiki dataset cleaned.")
+
+# Concatonate both datasets and shuffle
+print("Concatenating and shuffling datasets...")
+# concatenated_datasets = concatenate_datasets([bookcorpus, wiki]).shuffle(seed=114514)
+concatenated_datasets = wiki.shuffle(seed=114514)
+print("Datasets concatenated and shuffled.")
+
+print("Selecting " + str(DATA_SIZE_GB) + "GB of raw training text...")
+DATA_SIZE = DATA_SIZE_GB * (1024**3)  # GiB in bytes
+wikipedia_9GB = select_subset_by_size(concatenated_datasets, DATA_SIZE)
+
+print("Finished selecting ~" + str(DATA_SIZE_GB) + "GB dataset.")
+print("Final sample count:", len(wikipedia_9GB))
+print("Allocated:", torch.cuda.memory_allocated() / 1024**2, "MB")
+
+# %%
+######## This is used for subsequent code ########
+dataset_name = "wikipedia_9gb" # Specify save 
+dataset = wikipedia_9GB # Specify dataset
+vocab_size = 30000 # Define vocab size
+num_proc = multiprocessing.cpu_count()  # Number of processes for tokenization
+##################################################
+
+# %%
+print("================== Stage 2: Preparing Tokenizer ==================")
+
+
+tokenizer_id = "my_sentencepiece_en" + "_vocab_" + str(vocab_size) + "_[" + dataset_name + "]" # Name the tokenizer
+
+# Inherit from AlbertTokenizerFast
+print("Loading pretrained tokenizer...")
+pretrained_tokenizer = AutoTokenizer.from_pretrained('albert-base-v2')  
+print("Pretrained tokenizer loaded.")
+special_tokens = list(pretrained_tokenizer.all_special_tokens)
+print('Special tokens: ' + str(special_tokens))
+
+
+# %%
+# Train tokenizer using bartch iterator
+print("Training new tokenizer...")
+my_albert_tokenizer = pretrained_tokenizer.train_new_from_iterator(
+    text_iterator=batch_iterator(dataset=dataset),
+    vocab_size=vocab_size,
+)
+print("New tokenizer trained.")
+
+# Save the tokenizer to local disk
+print(f"Saving tokenizer to ./{tokenizer_id} ...")
+my_albert_tokenizer.save_pretrained(f"./{tokenizer_id}")
+print("Tokenizer saved.")
+
+# %%
+print("================== Stage 3: Tokenization ==================")
+
+
+# Get CPU count
+print(f"Using {num_proc} CPU cores for tokenization.")
+
+
+# Tokenize dataset with multiprocessing
+tokenized_datasets = dataset.map(
+    tokenize_text,
+    batched=True,
+    remove_columns=['text'],
+    num_proc=num_proc,
+    fn_kwargs={'tokenizer': my_albert_tokenizer},
+    desc="Tokenizing the dataset",
+)
+# Shuffle text
+tokenized_datasets = tokenized_datasets.shuffle(seed=1919810)
+print(f"the dataset contains in total {len(tokenized_datasets)*512} tokens")
+
+# save tokenized dataset to disk
+tokenized_datasets.save_to_disk(f"./tokenized_dataset_{dataset_name}_{vocab_size}vocab")
+print("Dataset tokenized and saved to disk.")
+
+albert_sentencepiece_unigram_english_fulldata_modelpretrain.py
+# The following code works. 
+# Specific for test purposes to tune hyperparameters and debugging.
+# Tuned down to a small dataset for fast iteration.
+# It uses 6000 vocab size SentencePiece Unigram tokenizer
+# to pretrain an ALBERT model on a small 0.15GB English Wikipedia
+
+# %%
+# Import all the necessary libraries
+import torch
+import gc
+from datasets import load_from_disk
+from accelerate import Accelerator
+from transformers import (
+    AutoTokenizer,
+    Trainer,
+    TrainingArguments,
+    DataCollatorForLanguageModeling,
+    AlbertConfig,
+    AlbertForMaskedLM
+)
+
+######## This is used for subsequent code ########
+dataset_name = "wikipedia_9gb" # Specify save name
+vocab_size = 30000 # Define vocab size
+batch_size = 8  # Adjust based on your hardware capabilities
+gradient_accumulation_steps = 64*4  # To simulate larger batch sizes
+tokenizer_id = "my_sentencepiece_en" + "_vocab_" + str(vocab_size) + "_[" + dataset_name + "]" # Name the tokenizer
+save_path = r'./albert_pretrained_model_final_VocabSize_' + str(vocab_size) + '_dataset_[' + str(tokenizer_id) +']' # define save path
+##################################################
+
+if __name__ == "__main__":
+    print("================== Stage 4: Preparing Training Environment ==================")
+    
+    # Initialize Accelerator for distributed training
+    accelerator = Accelerator()
+    
+    print("Loading tokenizer...")
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_id)
+    print("Tokenizer loaded.")
+
+    ####################### Define Training Arguments #######################
+    print("Setting up training arguments...")
+    training_args = TrainingArguments(
+        output_dir=save_path,
+        disable_tqdm=False,
+
+        # --- Critical arguments ---
+        learning_rate=3e-4,             # A good starting learning rate for pre-training
+        num_train_epochs=2,             # Or use max_steps
+        per_device_train_batch_size=batch_size, # Adjust based on your GPU/CPU memory
+        gradient_accumulation_steps=gradient_accumulation_steps,  # To simulate larger batch sizes
+        
+        # --- Stability ---
+        warmup_ratio=0.03,              # Warmup 3% of training
+        weight_decay=0.01,              # Standard regularization
+        
+        # --- Other useful settings ---
+        dataloader_num_workers=4,        # Number of subprocesses to use for data loading
+        dataloader_pin_memory=True,      # Pin memory during data loading for faster transfer to GPU
+        ddp_find_unused_parameters=False, # "Warning: did not find any unused parameters in the forward pass", safe to turn off
+        ddp_bucket_cap_mb=200, 
+        logging_steps=50,              # Log loss
+        logging_strategy="steps",
+        logging_first_step=True, # Log learning rate
+        report_to="tensorboard",      # Use TensorBoard for logging
+        save_steps=10000,                # Save a checkpoint every 10000 steps
+        save_total_limit=3,                 # Only keep the last 3 checkpoints
+        fp16=torch.cuda.is_available(), # Use mixed precision 
+    )
+    print("Training arguments set.")
+    print(f"Using batch size: {batch_size}")
+    #########################################################################
+
+    # Override the config to match new tokenizer
+    config = AlbertConfig(
+        vocab_size=tokenizer.vocab_size
+    )
+
+    # Load model architecture
+    model = AlbertForMaskedLM(config=config)
+
+    # Define data collator for MLM task
+    # Data collator will dynamically mask tokens during training
+    data_collator = DataCollatorForLanguageModeling(
+        tokenizer=tokenizer,
+        mlm=True,
+        mlm_probability=0.15,
+    )
+
+    # %%
+    # Clear Mem before training
+    gc.collect()
+    torch.cuda.empty_cache()
+
+    # load tokenized dataset from disk
+    print("Loading tokenized dataset from disk...")
+    tokenized_datasets = load_from_disk(f"./tokenized_dataset_{dataset_name}_{vocab_size}vocab", keep_in_memory=False)
+
+    print("Tokenized dataset loaded.")
+    # Define Trainer
+    # A trainer is responsible for the training loop
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=tokenized_datasets,
+        data_collator=data_collator
+    )
+
+    # Check for GPU availability
+    if torch.cuda.is_available():
+        print(f"GPU is available and ready!")
+        print(f"Device Name: {torch.cuda.get_device_name(0)}")
+    else:
+        print("WARNING: PyTorch cannot find a CUDA-enabled GPU.")
+        print("Training will run on the CPU (very slow).")
+
+    # %%
+    print("================== Stage 5: Training ==================")
+
+    # Start training
+    print("Starting training...")
+    trainer.train()
+    print("Training completed.")
+
+
+    if accelerator.is_main_process:
+
+        # Save the trained model to disk
+        print(f"Saving model to {save_path} ...")
+        trainer.save_model(save_path)
+        print("Model saved.")
+
+        # Save the tokenizer too
+        print("Saving tokenizer...")
+        tokenizer.save_pretrained(str(save_path) + "/tokenizer/")
+        print("Tokenizer saved.")
+
+    accelerator.wait_for_everyone()
+
+albert_sentencepiece_unigram_chinese_fulldata_tokenizertrain.py
+# Using https://huggingface.co/datasets/beyond/chinese_clean_passages_80m
+# Around 12 gb of cleaned Chinese text data for training
+# Selecting 9 gb for training
+# %%
+# Import all the necessary libraries
+import torch
+import multiprocessing
+from tqdm import tqdm
+from datasets import load_dataset
+from transformers import AutoTokenizer
+
+# Create a generator to dynamically load text data in chunks
+def batch_iterator(dataset,batch_size=10000):
+    for i in tqdm(range(0, len(dataset), batch_size)):
+        yield dataset[i: i + batch_size]["passage"]
+
+# Define a tokenization function
+def tokenize_text(examples, tokenizer=None):
+    return tokenizer(
+        examples["passage"], # Extract 'text' column from dataset
+        return_special_tokens_mask=True, # Required for special pretraining task, returns an additional arr for special tokens such as MASK or SEP.
+        truncation=True, # Tell the tokenizer to cut off texts longer than max_length
+        padding=False, # No padding here
+        max_length=512 # specifies the max length
+    )
+
+# AI 真的太好用了你们知道吗
+def select_subset_by_size(dataset, target_size_chars):
+    total_chars = 0
+    selected_indices = []
+
+    print(f"Selecting ~{target_size_chars / 1e9:.2f}B characters...")
+
+    for idx, text in tqdm(enumerate(dataset["passage"]), total=len(dataset)):
+        total_chars += len(text)  # FAST
+        selected_indices.append(idx)
+
+        if total_chars >= target_size_chars:
+            break
+
+    print(f"Selected {len(selected_indices)} samples.")
+    return dataset.select(selected_indices)
+
+def dataset_text_size_gb(dataset, text_column="passage"):
+    """
+    Compute exact UTF-8 size (in GB) of a HuggingFace Dataset text column.
+    """
+    total_bytes = 0
+
+    for text in dataset[text_column]:
+        total_bytes += len(text.encode("utf-8"))
+
+    gb = total_bytes / (1024 ** 3)
+    return gb
+
+
+
+# %%
+
+######## === Select SIZE GB of raw text ===########
+DATA_SIZE_GB = 9
+###################################################
+
+print("================== Stage 1: Starting Dataset Preparation ==================")
+
+# Load dataset
+print("Loading datasets...")
+# bookcorpus = load_dataset("bookcorpus", split="train")
+chinese = load_dataset("beyond/chinese_clean_passages_80m", split='train', trust_remote_code=True)
+print("Datasets loaded.")
+
+# %%
+
+print("Selecting " + str(DATA_SIZE_GB) + "GB of raw training text...")
+# Chinese ≈ 3 bytes per char
+TARGET_CHARS = int(9 * (1024**3) / 3)
+chinese_9GB = select_subset_by_size(chinese, TARGET_CHARS)
+print("Dataset selection completed.")
+
+# Shuffle
+chinese_9GB = chinese_9GB.shuffle(seed=114514)
+print("Dataset shuffled.")
+
+
+print("Finished selecting ~" + str(DATA_SIZE_GB) + "GB dataset.")
+print("Final sample count:", len(chinese_9GB))
+print("Approximate size (GB):", dataset_text_size_gb(chinese_9GB))
+
+# %%
+######## This is used for subsequent code ########
+dataset_name = "chinese_9GB" # Specify save 
+dataset = chinese_9GB # Specify dataset
+vocab_size = 30000 # Define vocab size
+num_proc = 100  # Number of processes for tokenization
+##################################################
+
+# %%
+print("================== Stage 2: Preparing Tokenizer ==================")
+
+
+tokenizer_id = "my_sentencepiece_zh" + "_vocab_" + str(vocab_size) + dataset_name # Name the tokenizer
+
+# Inherit from AlbertTokenizerFast
+print("Loading pretrained tokenizer...")
+pretrained_tokenizer = AutoTokenizer.from_pretrained('albert-base-v2')  
+print("Pretrained tokenizer loaded.")
+special_tokens = list(pretrained_tokenizer.all_special_tokens)
+print('Special tokens: ' + str(special_tokens))
+
+
+# %%
+# Train tokenizer using bartch iterator
+print(f"Using {num_proc} CPU cores for training.")
+print("Training new tokenizer...")
+my_albert_tokenizer = pretrained_tokenizer.train_new_from_iterator(
+    text_iterator=batch_iterator(dataset=dataset),
+    vocab_size=vocab_size,
+)
+print("New tokenizer trained.")
+
+# Save the tokenizer to local disk
+print(f"Saving tokenizer to ./{tokenizer_id} ...")
+my_albert_tokenizer.save_pretrained(f"./{tokenizer_id}")
+print("Tokenizer saved.")
+
+# %%
+print("================== Stage 3: Tokenization ==================")
+
+
+# Get CPU count
+print(f"Using {num_proc} CPU cores for tokenization.")
+
+
+# Tokenize dataset with multiprocessing
+tokenized_datasets = dataset.map(
+    tokenize_text,
+    batched=True,
+    remove_columns=['passage'],
+    num_proc=num_proc,
+    fn_kwargs={'tokenizer': my_albert_tokenizer},
+    desc="Tokenizing the dataset",
+)
+# Shuffle text
+tokenized_datasets = tokenized_datasets.shuffle(seed=1919810)
+print(f"the dataset contains in total {len(tokenized_datasets)*512} tokens")
+
+# save tokenized dataset to disk
+tokenized_datasets.save_to_disk(f"./tokenized_dataset_{dataset_name}_{vocab_size}vocab")
+print("Dataset tokenized and saved to disk.")
+# %%
+albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py
+# The model pretrain code has versions for 2048, 1024, 512 simulated batch to test which one is the most effective at training
+# The following code works. 
+# Specific for test purposes to tune hyperparameters and debugging.
+# Tuned down to a small dataset for fast iteration.
+# It uses 6000 vocab size SentencePiece Unigram tokenizer
+# to pretrain an ALBERT model on a small 0.15GB English Wikipedia
+
+# %%
+# Import all the necessary libraries
+import torch
+import gc
+from datasets import load_from_disk
+from accelerate import Accelerator
+from transformers import (
+    AutoTokenizer,
+    Trainer,
+    TrainingArguments,
+    DataCollatorForLanguageModeling,
+    AlbertConfig,
+    AlbertForMaskedLM
+)
+
+######## This is used for subsequent code ########
+dataset_name = "chinese_9GB" # Specify save name
+vocab_size = 30000 # Define vocab size
+batch_size = 8  # Adjust based on your hardware capabilities
+gradient_accumulation_steps = 64*4  # To simulate larger batch sizes
+tokenizer_id = "my_sentencepiece_zh" + "_vocab_" + str(vocab_size) + dataset_name
+save_path = r'./albert_pretrained_model_final_VocabSize_' + str(vocab_size) + '_dataset_' + str(tokenizer_id) # define save path
+##################################################
+
+if __name__ == "__main__":
+    print("================== Stage 4: Preparing Training Environment ==================")
+    
+    # Initialize Accelerator for distributed training
+    accelerator = Accelerator()
+    
+    print("Loading tokenizer...")
+    tokenizer = AutoTokenizer.from_pretrained("../tokenized_text/" + tokenizer_id)
+    print("Tokenizer loaded.")
+
+    ####################### Define Training Arguments #######################
+    print("Setting up training arguments...")
+    training_args = TrainingArguments(
+        output_dir=save_path,
+        disable_tqdm=False,
+
+        # --- Critical arguments ---
+        learning_rate=3e-4,             # A good starting learning rate for pre-training
+        num_train_epochs=2,             # Or use max_steps
+        per_device_train_batch_size=batch_size, # Adjust based on your GPU/CPU memory
+        gradient_accumulation_steps=gradient_accumulation_steps,  # To simulate larger batch sizes
+        
+        # --- Stability ---
+        warmup_ratio=0.03,              # Warmup 3% of training
+        weight_decay=0.01,              # Standard regularization
+        
+        # --- Other useful settings ---
+        dataloader_num_workers=4,        # Number of subprocesses to use for data loading
+        dataloader_pin_memory=True,      # Pin memory during data loading for faster transfer to GPU
+        ddp_find_unused_parameters=False, # "Warning: did not find any unused parameters in the forward pass", safe to turn off
+        ddp_bucket_cap_mb=200, 
+        logging_steps=50,              # Log loss
+        logging_strategy="steps",
+        logging_first_step=True, # Log learning rate
+        report_to="tensorboard",      # Use TensorBoard for logging
+        save_steps=10000,                # Save a checkpoint every 10000 steps
+        save_total_limit=3,                 # Only keep the last 3 checkpoints
+        fp16=torch.cuda.is_available(), # Use mixed precision 
+    )
+    print("Training arguments set.")
+    print(f"Using batch size: {batch_size}")
+    print(f"Using batch size: {batch_size}")
+    print(f"Gradient accumulation steps: {gradient_accumulation_steps}")
+    print(f"Total effective batch size: {batch_size * gradient_accumulation_steps}")
+    #########################################################################
+
+    # Override the config to match new tokenizer
+    config = AlbertConfig(
+        vocab_size=tokenizer.vocab_size
+    )
+
+    # Load model architecture
+    model = AlbertForMaskedLM(config=config)
+
+    # Define data collator for MLM task
+    # Data collator will dynamically mask tokens during training
+    data_collator = DataCollatorForLanguageModeling(
+        tokenizer=tokenizer,
+        mlm=True,
+        mlm_probability=0.15,
+    )
+
+    # %%
+    # Clear Mem before training
+    gc.collect()
+    torch.cuda.empty_cache()
+
+    # load tokenized dataset from disk
+    print("Loading tokenized dataset from disk...")
+    tokenized_datasets = load_from_disk(f"../tokenized_text/tokenized_dataset_{dataset_name}_{vocab_size}vocab", keep_in_memory=False)
+
+    print("Tokenized dataset loaded.")
+    # Define Trainer
+    # A trainer is responsible for the training loop
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=tokenized_datasets,
+        data_collator=data_collator
+    )
+
+    # Check for GPU availability
+    if torch.cuda.is_available():
+        print(f"GPU is available and ready!")
+        print(f"Device Name: {torch.cuda.get_device_name(0)}")
+    else:
+        print("WARNING: PyTorch cannot find a CUDA-enabled GPU.")
+        print("Training will run on the CPU (very slow).")
+
+    # %%
+    print("================== Stage 5: Training ==================")
+
+    # Start training
+    print("Starting training...")
+    trainer.train()
+    print("Training completed.")
+
+
+    if accelerator.is_main_process:
+
+        # Save the trained model to disk
+        print(f"Saving model to {save_path} ...")
+        trainer.save_model(save_path)
+        print("Model saved.")
+
+        # Save the tokenizer too
+        print("Saving tokenizer...")
+        tokenizer.save_pretrained(str(save_path) + "/tokenizer/")
+        print("Tokenizer saved.")
+
+    accelerator.wait_for_everyone()
+
+albert_sentencepiece_unigram_ancientchinese_fulldata_tokenizertrain.py
+# Using https://huggingface.co/datasets/beyond/chinese_clean_texts_80m
+# Around 12 gb of cleaned Chinese text data for training
+# Selecting 9 gb for training
+# %%
+# Import all the necessary libraries
+from tqdm import tqdm
+from datasets import load_dataset, Dataset
+from transformers import AutoTokenizer
+
+# Create a generator to dynamically load text data in chunks
+def batch_iterator(dataset,batch_size=10000):
+    for i in tqdm(range(0, len(dataset), batch_size)):
+        yield dataset[i: i + batch_size]["text"]
+
+# Define a tokenization function
+def tokenize_text(examples, tokenizer=None):
+    return tokenizer(
+        examples["text"], # Extract 'text' column from dataset
+        return_special_tokens_mask=True, # Required for special pretraining task, returns an additional arr for special tokens such as MASK or SEP.
+        truncation=True, # Tell the tokenizer to cut off texts longer than max_length
+        padding=False, # No padding here
+        max_length=512 # specifies the max length
+    )
+
+# AI 真的太好用了你们知道吗
+def select_subset_by_size(dataset, target_size_chars):
+    total_chars = 0
+    selected_indices = []
+
+    print(f"Selecting ~{target_size_chars / 1e9:.2f}B characters...")
+
+    for idx, text in tqdm(enumerate(dataset["text"]), total=len(dataset)):
+        total_chars += len(text)  # FAST
+        selected_indices.append(idx)
+
+        if total_chars >= target_size_chars:
+            break
+
+    print(f"Selected {len(selected_indices)} samples.")
+    return dataset.select(selected_indices)
+
+def dataset_text_size_gb(dataset, text_column="text"):
+    """
+    Compute exact UTF-8 size (in GB) of a HuggingFace Dataset text column.
+    """
+    total_bytes = 0
+
+    for text in dataset[text_column]:
+        total_bytes += len(text.encode("utf-8"))
+
+    gb = total_bytes / (1024 ** 3)
+    return gb
+
+def pack_dataset_texts(dataset, text_column="text", max_chars=2048):
+    packed_texts = []
+    buffer = []
+
+    buffer_len = 0
+
+    for text in tqdm(dataset[text_column], desc="Packing texts"):
+        if not text:
+            continue
+
+        buffer.append(text)
+        buffer_len += len(text)
+
+        if buffer_len >= max_chars:
+            packed_texts.append("".join(buffer))
+            buffer = []
+            buffer_len = 0
+
+    if buffer:
+        packed_texts.append("".join(buffer))
+
+    return Dataset.from_dict({text_column: packed_texts})
+
+# %%
+
+######## === Select SIZE GB of raw text ===########
+DATA_SIZE_GB = 9
+###################################################
+
+print("================== Stage 1: Starting Dataset Preparation ==================")
+
+# Load dataset
+print("Loading datasets...")
+acnientchinese = load_dataset("Wenyanmuc/WenyanGPT", split='train', trust_remote_code=True)
+print("Datasets loaded.")
+
+# %%
+
+# Shuffle
+acnientchinese = acnientchinese.shuffle(seed=114514)
+print("Dataset shuffled.")
+
+
+print("Selecting " + str(DATA_SIZE_GB) + "GB of raw training text...")
+# Chinese ≈ 3 bytes per char
+TARGET_CHARS = int(9 * (1024**3) / 3)
+acnientchinese_9GB = select_subset_by_size(acnientchinese, TARGET_CHARS)
+acnientchinese_5GB = select_subset_by_size(acnientchinese, int(5 * (1024**3) / 3))
+print("Dataset selection completed.")
+
+
+
+print("Finished selecting ~" + str(DATA_SIZE_GB) + "GB dataset.")
+print("Final sample count:", len(acnientchinese_9GB))
+# print("Approximate size (GB):", dataset_text_size_gb(acnientchinese_9GB))
+
+# print("Packing texts into larger chunks...")
+# acnientchinese_9GB = pack_dataset_texts(acnientchinese_9GB)
+# print("Packing completed.")
+# print("Final packed sample count:", len(acnientchinese_9GB))
+
+# %%
+######## This is used for subsequent code ########
+dataset_name = "acnientchinese_9GB" # Specify save 
+dataset = acnientchinese_9GB # Specify dataset
+vocab_size = 30000 # Define vocab size
+num_proc = 100  # Number of processes for tokenization
+##################################################
+
+# %%
+print("================== Stage 2: Preparing Tokenizer ==================")
+
+
+tokenizer_id = "my_sentencepiece_zh" + "_vocab_" + str(vocab_size) + dataset_name # Name the tokenizer
+
+# Inherit from AlbertTokenizerFast
+print("Loading pretrained tokenizer...")
+pretrained_tokenizer = AutoTokenizer.from_pretrained('albert-base-v2')  
+print("Pretrained tokenizer loaded.")
+special_tokens = list(pretrained_tokenizer.all_special_tokens)
+print('Special tokens: ' + str(special_tokens))
+
+
+# %%
+# Train tokenizer using bartch iterator
+# print(f"Using {num_proc} CPU cores for training.")
+print("Training new tokenizer...")
+my_albert_tokenizer = pretrained_tokenizer.train_new_from_iterator(
+    text_iterator=batch_iterator(dataset=acnientchinese_5GB),
+    vocab_size=vocab_size,
+)
+print("New tokenizer trained.")
+
+# Save the tokenizer to local disk
+print(f"Saving tokenizer to ./{tokenizer_id} ...")
+my_albert_tokenizer.save_pretrained(f"./{tokenizer_id}")
+print("Tokenizer saved.")
+
+# %%
+print("================== Stage 3: Tokenization ==================")
+
+
+# Get CPU count
+print(f"Using {num_proc} CPU cores for tokenization.")
+
+
+# Tokenize dataset with multiprocessing
+tokenized_datasets = dataset.map(
+    tokenize_text,
+    batched=True,
+    remove_columns=['text'],
+    num_proc=num_proc,
+    fn_kwargs={'tokenizer': my_albert_tokenizer},
+    desc="Tokenizing the dataset",
+)
+# Shuffle text
+tokenized_datasets = tokenized_datasets.shuffle(seed=1919810)
+print(f"the dataset contains in total {len(tokenized_datasets)*512} tokens")
+
+# save tokenized dataset to disk
+tokenized_datasets.save_to_disk(f"./tokenized_dataset_{dataset_name}_{vocab_size}vocab")
+print("Dataset tokenized and saved to disk.")
+# %%
+check_unique_char.py
+from datasets import load_dataset, Dataset
+from collections import Counter
+from tqdm import tqdm
+
+def check_unique_chars(dataset, text_column="text"):
+    print(f"Counting unique characters...")
+    char_counter = Counter()
+    
+    # Using .map with batches is much faster for character counting
+    def count_batch(batch):
+        # Join all texts in the batch into one large string for a single update
+        full_text = "".join(filter(None, batch[text_column]))
+        char_counter.update(full_text)
+        return batch
+
+    dataset.map(count_batch, batched=True, batch_size=1000, desc="Counting characters")
+    
+    unique_chars = sorted(list(char_counter.keys()))
+    print(f"Total Unique Characters: {len(unique_chars)}")
+    return char_counter
+
+def select_subset_by_size(dataset, target_size_chars):
+    total_chars = 0
+    selected_indices = []
+
+    print(f"Selecting ~{target_size_chars / 1e9:.2f}B characters...")
+
+    for idx, text in tqdm(enumerate(dataset["text"]), total=len(dataset)):
+        total_chars += len(text)  # FAST
+        selected_indices.append(idx)
+
+        if total_chars >= target_size_chars:
+            break
+
+    print(f"Selected {len(selected_indices)} samples.")
+    return dataset.select(selected_indices)
+
+# Replace with your actual path
+NAME = "Wenyanmuc/WenyanGPT"
+
+if __name__ == "__main__":
+
+    TARGET_CHARS = int(9 * (1024**3) / 3)
+
+    ds = load_dataset(NAME, split='train', trust_remote_code=True)
+    ds = select_subset_by_size(ds, TARGET_CHARS)
+    ds.save_to_disk("ancientchinese_full_dataset_subset_9GB")
+
+    counter = check_unique_chars(ds)
+output_size_gb.py
+from datasets import load_dataset, Dataset
+from collections import Counter
+from tqdm import tqdm
+
+def check_unique_chars(dataset, text_column="text"):
+    print(f"Counting unique characters...")
+    char_counter = Counter()
+    
+    # Using .map with batches is much faster for character counting
+    def count_batch(batch):
+        # Join all texts in the batch into one large string for a single update
+        full_text = "".join(filter(None, batch[text_column]))
+        char_counter.update(full_text)
+        return batch
+
+    dataset.map(count_batch, batched=True, batch_size=1000, desc="Counting characters")
+    
+    unique_chars = sorted(list(char_counter.keys()))
+    print(f"Total Unique Characters: {len(unique_chars)}")
+    return char_counter
+
+def select_subset_by_size(dataset, target_size_chars):
+    total_chars = 0
+    selected_indices = []
+
+    print(f"Selecting ~{target_size_chars / 1e9:.2f}B characters...")
+
+    for idx, text in tqdm(enumerate(dataset["text"]), total=len(dataset)):
+        total_chars += len(text)  # FAST
+        selected_indices.append(idx)
+
+        if total_chars >= target_size_chars:
+            break
+
+    print(f"Selected {len(selected_indices)} samples.")
+    return dataset.select(selected_indices)
+
+# Replace with your actual path
+NAME = "Wenyanmuc/WenyanGPT"
+
+if __name__ == "__main__":
+
+    TARGET_CHARS = int(9 * (1024**3) / 3)
+
+    ds = load_dataset(NAME, split='train', trust_remote_code=True)
+    ds = select_subset_by_size(ds, TARGET_CHARS)
+    ds.save_to_disk("ancientchinese_full_dataset_subset_9GB")
+
+    counter = check_unique_chars(ds)
+
+The control commands for copy paste:
+
+
+################## token + pretrain script ############
+
+scp "D:\LM\albert_pretrain_sentencepiece_english_full_dataset\albert_pretrain_sentencepiece_english_small_dataset\albert_sentencepiece_unigram_english_wikipedia_0.15GB_pretrainscript.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/english_wikipedia_9gb_sentencepiece_unigram/test_train_wiki015GB
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd english_wikipedia_9gb_sentencepiece_unigram/test_train_wiki015GB
+tmux new -s test_train_wiki015GB
+
+export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+export CUDA_VISIBLE_DEVICES=0
+accelerate launch \
+  --num_processes 1 \
+  --main_process_port 0 \
+  --mixed_precision fp16 \
+  albert_sentencepiece_unigram_english_wikipedia_0.15GB_pretrainscript.py
+
+# Run script
+tmux new -s {session name}
+tmux attach -t {session name}
+
+tmux new -s test_train_wiki015GB
+
+
+
+rm -rf <FOLDER_NAME>/*
+
+nvidia-smi
+
+######################################################
+
+####################### Token only script ##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_english_full_dataset\albert_pretrain_sentencepiece_english_small_dataset\albert_sentencepiece_unigram_english_wikipedia_0.15GB_tokenizertrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/english_wikipedia_9gb_sentencepiece_unigram/test_train_wiki015GB
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd english_wikipedia_9gb_sentencepiece_unigram/test_train_wiki015GB
+tmux new -s test_train_wiki015GB
+
+export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+export CUDA_VISIBLE_DEVICES=0
+accelerate launch \
+  --num_processes 1 \
+  --main_process_port 0 \
+  --mixed_precision fp16 \
+  albert_sentencepiece_unigram_english_wikipedia_0.15GB_tokenizertrain.py
+
+###############################################################
+
+####################### Model only script ##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_english_full_dataset\albert_pretrain_sentencepiece_english_small_dataset\albert_sentencepiece_unigram_english_wikipedia_0.15GB_modelpretrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/english_wikipedia_9gb_sentencepiece_unigram/test_train_wiki015GB
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd english_wikipedia_9gb_sentencepiece_unigram/test_train_wiki015GB
+tmux new -s test_train_wiki015GB
+
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export CUDA_VISIBLE_DEVICES=1
+accelerate launch \
+  --num_processes 1 \
+  --main_process_port 29501 \
+  --mixed_precision fp16 \
+ albert_sentencepiece_unigram_english_wikipedia_0.15GB_modelpretrain.py
+
+Do not delete:
+albert_sentencepiece_unigram_english_wikipedia_0.15GB_modelpretrain.py
+albert_sentencepiece_unigram_english_wikipedia_0.15GB_tokenizertrain.py
+'my_sentencepiece_en_vocab_6000_[wikipedia_0.15GB]'
+tokenized_dataset_wikipedia_0.15GB_6000vocab
+
+###############################################################
+
+####################### Final token script ##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_english_full_dataset\albert_pretrain_sentencepiece_english_full_dataset\final code\albert_sentencepiece_unigram_english_fulldata_tokenizertrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/english_wikipedia_9gb_sentencepiece_unigram/train_attempt1
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd english_wikipedia_9gb_sentencepiece_unigram/train_attempt1
+tmux new -s train_attempt1
+
+export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+export CUDA_VISIBLE_DEVICES=0
+accelerate launch \
+  --num_processes 1 \
+  --main_process_port 0 \
+  --mixed_precision fp16 \
+albert_sentencepiece_unigram_english_fulldata_tokenizertrain.py
+
+
+###############################################################
+
+####################### Model train attempt 1 script ##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_english_full_dataset\albert_pretrain_sentencepiece_english_full_dataset\final code\albert_sentencepiece_unigram_english_fulldata_modelpretrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/english_wikipedia_9gb_sentencepiece_unigram/train_attempt1
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd english_wikipedia_9gb_sentencepiece_unigram/train_attempt1
+tmux new -s train_attempt1
+
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export CUDA_VISIBLE_DEVICES=1
+accelerate launch \
+  --num_processes 1 \
+  --main_process_port 29501 \
+  --mixed_precision fp16 \
+albert_sentencepiece_unigram_english_fulldata_modelpretrain.py
+
+nvidia-smi
+tmux attach -t train_attempt1
+
+To view tensorboard:
+
+tensorboard \
+  --logdir ./albert_pretrained_model_final_VocabSize_30000_dataset_[my_sentencepiece_en_vocab_30000_[wikipedia_9gb]]/runs \
+  --port 6006
+
+
+ssh -L 6006:localhost:6006 wenyu@dsail4.cs.dartmouth.edu
+
+###############################################################
+
+####################### Model train attempt 2 script ##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_english_full_dataset\albert_pretrain_sentencepiece_english_full_dataset\final code\albert_sentencepiece_unigram_english_fulldata_modelpretrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/english_wikipedia_9gb_sentencepiece_unigram/train_attempt2
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd english_wikipedia_9gb_sentencepiece_unigram/train_attempt2
+tmux new -s train_attempt2
+
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export CUDA_VISIBLE_DEVICES=2
+accelerate launch \
+  --num_processes 1 \
+  --main_process_port 29502 \
+  --mixed_precision fp16 \
+albert_sentencepiece_unigram_english_fulldata_modelpretrain.py
+
+nvidia-smi
+tmux attach -t train_attempt2
+
+To view tensorboard:
+
+tensorboard \
+  --logdir ./albert_pretrained_model_final_VocabSize_30000_dataset_[my_sentencepiece_en_vocab_30000_[wikipedia_9gb]]/runs \
+  --port 6006
+
+
+ssh -L 6006:localhost:6006 wenyu@dsail4.cs.dartmouth.edu
+
+###############################################################
+
+2025/11/14 18:17
+    return F.linear(input, self.weight, self.bias)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1024.00 MiB. GPU 0 has a total capacity of 23.46 GiB of which 681.88 MiB is free. Process 787321 has 7.02 GiB memory in use. Including non-PyTorch memory, this process has 15.75 GiB memory in use. Of the allocated memory 15.32 GiB is allocated by PyTorch, and 237.36 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+2025/11/14 18:44
+ return 0.5 * input * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (input + 0.044715 * torch.pow(input, 3.0))))
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1024.00 MiB. GPU 0 has a total capacity of 23.46 GiB of which 959.88 MiB is free. Including non-PyTorch memory, this process has 22.50 GiB memory in use. Of the allocated memory 22.27 GiB is allocated by PyTorch, and 37.86 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+2025/11/14 18:50
+ return 0.5 * input * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (input + 0.044715 * torch.pow(input, 3.0))))
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 512.00 MiB. GPU 0 has a total capacity of 23.46 GiB of which 499.88 MiB is free. Including non-PyTorch memory, this process has 22.95 GiB memory in use. Of the allocated memory 22.75 GiB is allocated by PyTorch, and 12.11 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+nvidia-smi
+
+####################### Final token script ##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_chinese_full_dataset\albert_sentencepiece_unigram_chinese_fulldata_tokenizertrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt1_effectiveBatch2048
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt1_effectiveBatch2048
+tmux new -s zh_train_attempt1_effectiveBatch2048
+
+python albert_sentencepiece_unigram_chinese_fulldata_tokenizertrain.py
+
+
+tmux attach -t zh_train_attempt1_effectiveBatch2048
+###############################################################
+
+####################### Model script 1##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_chinese_full_dataset\batch 2048\albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt1_effectiveBatch2048
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt1_effectiveBatch2048
+tmux new -s zh_train_attempt1_effectiveBatch2048
+
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export CUDA_VISIBLE_DEVICES=0
+accelerate launch \
+  --num_processes 1 \
+  --main_process_port 29501 \
+  --mixed_precision fp16 \
+albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py
+
+nvidia-smi
+tmux attach -t zh_train_attempt1_effectiveBatch2048
+
+tensorboard \
+  --logdir ./albert_pretrained_model_final_VocabSize_30000_dataset_my_sentencepiece_zh_vocab_30000chinese_9GB/runs \
+  --port 6006
+
+ssh -L 6006:localhost:6006 wenyu@dsail4.cs.dartmouth.edu
+###############################################################
+
+####################### Model script 2##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_chinese_full_dataset\batch 512\albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt2_effectiveBatch512
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt2_effectiveBatch512
+tmux new -s zh_train_attempt2_effectiveBatch512
+
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export CUDA_VISIBLE_DEVICES=2
+accelerate launch \
+  --num_processes 1 \
+  --main_process_port 29502 \
+  --mixed_precision fp16 \
+albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py
+
+nvidia-smi
+tmux attach -t zh_train_attempt2_effectiveBatch512
+
+tensorboard \
+  --logdir ./albert_pretrained_model_final_VocabSize_30000_dataset_my_sentencepiece_zh_vocab_30000chinese_9GB/runs \
+  --port 6006
+
+ssh -L 6006:localhost:6006 wenyu@dsail4.cs.dartmouth.edu
+###############################################################
+
+####################### Model script 3##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_chinese_full_dataset\batch 1024\albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt3_effectiveBatch1024
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt3_effectiveBatch1024
+tmux new -s zh_train_attempt3_effectiveBatch1024
+
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export CUDA_VISIBLE_DEVICES=1
+accelerate launch \
+  --num_processes 1 \
+  --main_process_port 29503 \
+  --mixed_precision fp16 \
+albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py
+
+nvidia-smi
+tmux attach -t zh_train_attempt3_effectiveBatch1024
+
+tensorboard \
+  --logdir ./albert_pretrained_model_final_VocabSize_30000_dataset_my_sentencepiece_zh_vocab_30000chinese_9GB/runs \
+  --port 6006
+
+ssh -L 6006:localhost:6006 wenyu@dsail4.cs.dartmouth.edu
+###############################################################
+nvidia-smi
+
+####################### Final token script ##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_ancientchinese_full_dataset\albert_sentencepiece_unigram_ancientchinese_fulldata_tokenizertrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/ancientchinese_wenyangpt_9gb_sentencepiece_unigram/tokenized_text
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd ancientchinese_wenyangpt_9gb_sentencepiece_unigram/tokenized_text
+tmux new -s ac_train_attempt1_effectiveBatch2048
+
+python albert_sentencepiece_unigram_ancientchinese_fulldata_tokenizertrain.py
+
+
+tmux attach -t ac_train_attempt1_effectiveBatch2048
+###############################################################
+
+####################### Model script 1##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_chinese_full_dataset\batch 2048\albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt1_effectiveBatch2048
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt1_effectiveBatch2048
+tmux new -s zh_train_attempt1_effectiveBatch2048
+
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export CUDA_VISIBLE_DEVICES=1
+accelerate launch \
+  --num_processes 1 \
+  --main_process_port 29501 \
+  --mixed_precision fp16 \
+albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py
+
+nvidia-smi
+tmux attach -t zh_train_attempt1_effectiveBatch2048
+
+###############################################################
+
+####################### Model script 2##############################
+
+scp "D:\LM\albert_pretrain_sentencepiece_chinese_full_dataset\batch 512\albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py" wenyu@dsail4.cs.dartmouth.edu:~/albert_train/chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt2_effectiveBatch512
+
+ssh wenyu@dsail4.cs.dartmouth.edu
+
+cd albert_train
+source albert_env/bin/activate
+cd chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt2_effectiveBatch512
+tmux new -s zh_train_attempt2_effectiveBatch512
+
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export CUDA_VISIBLE_DEVICES=2
+accelerate launch \
+  --num_processes 1 \
+  --main_process_port 29502 \
+  --mixed_precision fp16 \
+albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py
+
+nvidia-smi
+tmux attach -t zh_train_attempt2_effectiveBatch512
+
+###############################################################
+
+The experiment log:
+
+Trying to debug the cuda oom problem. Trying With batch size 1 using 0.15gb of data. Output as below
+
+ torch.cuda.memory_allocated() Allocated: 775.4326171875 MB Mem
+
+Ran successfully. Trying higher batch size of 2.
+
+Allocated: 775.4326171875 MB Mem.
+
+Ran successfully. Trying higher batch size of 4.
+
+Allocated: 775.4326171875 MB
+
+Sucsessful. WTF? why is it working all of a sudden?
+Trying batch size 32
+
+return 0.5 * input * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (input + 0.044715 * torch.pow(input, 3.0))))
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1024.00 MiB. GPU 0 has a total capacity of 23.46 GiB of which 647.88 MiB is free. Process 132609 has 1.30 GiB memory in use. Including non-PyTorch memory, this process has 21.51 GiB memory in use. Of the allocated memory 21.27 GiB is allocated by PyTorch, and 41.86 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+Try remove max length padding, Use max_split_size_mb on launch
+
+RuntimeError: !block->expandable_segment_ INTERNAL ASSERT FAILED at "../c10/cuda/CUDACachingAllocator.cpp":2586
+disable expandable_segments
+
+ return 0.5 * input * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (input + 0.044715 * torch.pow(input, 3.0))))
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1024.00 MiB. GPU 0 has a total capacity of 23.46 GiB of which 987.88 MiB is free. Including non-PyTorch memory, this process has 22.48 GiB memory in use. Of the allocated memory 22.27 GiB is allocated by PyTorch, and 9.86 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+Now trying lower batch size of 16
+
+OOM, trying 8
+
+8 works, estimated training time on 0.15 gb around 2 hours. trying increasing gradient_accumulation_steps to 16. 
+
+Works, estimated training time 2:14:03. 
+Try 4 GPU with batch size 32 with
+
+export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+accelerate launch \
+  --num_processes 4 \
+  --main_process_port 0 \
+  --mixed_precision fp16 \
+ albert_sentencepiece_unigram_english_wikipedia_0.15GB_modelpretrain.py
+
+Failed during tokenization. 
+Trying splitting tokenizer and model training into 2 section of code.
+
+Tokenizer and Model training script successfully ran
+Try parallel processing across 4 GPUs on model training script
+
+got stuck after printing "Setting up training arguments..."
+wait longer to see if it responds
+
+Timeout error.Wrong port. Trying 29501
+
+Successfully ran on 4 GPU, Estimated time around 30 min
+Trying new training arguments to speed up training.
+training_args = TrainingArguments(
+        output_dir=save_path,
+        disable_tqdm=False,
+
+        # --- Critical arguments ---
+        learning_rate=1e-5,             # A good starting learning rate for pre-training
+        num_train_epochs=1,             # Or use max_steps
+        per_device_train_batch_size=batch_size, # Adjust based on your GPU/CPU memory
+        gradient_accumulation_steps=gradient_accumulation_steps,  # To simulate larger batch sizes
+        
+        # --- Stability ---
+        warmup_steps=1000,              # Number of steps to slowly ramp up the LR
+        weight_decay=0.01,              # Standard regularization
+        
+        # --- Other useful settings ---
+        dataloader_num_workers=4,        # Number of subprocesses to use for data loading
+        dataloader_pin_memory=True,      # Pin memory during data loading for faster transfer to GPU
+        ddp_find_unused_parameters=False, # "Warning: did not find any unused parameters in the forward pass", safe to turn off
+        ddp_bucket_cap_mb=200, 
+        logging_steps=1000,              # Log loss every 100 steps
+        save_steps=10000,                # Save a checkpoint every 10000 steps
+        save_total_limit=3,                 # Only keep the last 3 checkpoints
+        fp16=torch.cuda.is_available(), # Use mixed precision 
+    )
+
+ return 0.5 * input * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (input + 0.044715 * torch.pow(input, 3.0))))
+[rank0]: torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 256.00 MiB. GPU 0 has a total capacity of 23.46 GiB of which 205.88 MiB is free. Process 300129 has 3.61 GiB memory in use. Including non-PyTorch memory, this process has 19.63 GiB memory in use. Of the allocated memory 19.25 GiB is allocated by PyTorch, and 32.06 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+Trying export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
+OOM again, GPU 0 occupied. Changing batch size back to 8 incase GPU occupied in the future. Trying again with param
+training_args = TrainingArguments(
+        output_dir=save_path,
+        disable_tqdm=False,
+
+        # --- Critical arguments ---
+        learning_rate=3e-4,             # A good starting learning rate for pre-training
+        num_train_epochs=1,             # Or use max_steps
+        per_device_train_batch_size=batch_size, # Adjust based on your GPU/CPU memory
+        gradient_accumulation_steps=gradient_accumulation_steps,  # To simulate larger batch sizes
+        
+        # --- Stability ---
+        warmup_steps=5000,              # Number of steps to slowly ramp up the LR
+        weight_decay=0.01,              # Standard regularization
+        
+        # --- Other useful settings ---
+        dataloader_num_workers=4,        # Number of subprocesses to use for data loading
+        dataloader_pin_memory=True,      # Pin memory during data loading for faster transfer to GPU
+        ddp_find_unused_parameters=False, # "Warning: did not find any unused parameters in the forward pass", safe to turn off
+        ddp_bucket_cap_mb=200, 
+        logging_steps=1000,              # Log loss every 100 steps
+        save_steps=10000,                # Save a checkpoint every 10000 steps
+        save_total_limit=3,                 # Only keep the last 3 checkpoints
+        fp16=torch.cuda.is_available(), # Use mixed precision 
+    )
+
+dataset_name = "wikipedia_0.15GB" # Specify save name
+vocab_size = 6000 # Define vocab size
+batch_size = 8  # Adjust based on your hardware capabilities
+gradient_accumulation_steps = 64  # To simulate larger batch sizes
+tokenizer_id = "my_sentencepiece_en" + "_vocab_" + str(vocab_size) + "_[" + dataset_name + "]" # Name the tokenizer
+save_path = r'./albert_pretrained_model_final_VocabSize_' + str(vocab_size) + '_dataset_[' + str(tokenizer_id) +']' # define save path
+
+Other GPU occupied, using GPU 1 only estimated time around 2 hours. Seemes to linearly scale with number of gpu compared to 30 min with 4 gpu
+Mem usage 21829MiB /  24576MiB using 99% GPU
+
+Estimate training time:
+11 days using 1 GPU and 3 days with 4 GPU 
+Using above param
+training entire Wikipedia 20 GB
+
+Oh shit we are only using 9gb
+1.25 days using 4 GPU and 5 days with 1
+
+Training 9gb on 1 GPU
+Estimated time 463:37:50
+
+Script still running
+New estimated training time around 10 days
+Loss 10.23 → ~10.16
+Still waiting for training
+English Wikipedia 9gb
+
+ 10.0251, 'grad_norm': 2022.451171875, 'learning_rate': 1.9999999999999998e-05, 'epoch': 0.13}
+{'loss': 9.9657, 'grad_norm': 495.2892150878906, 'learning_rate': 2.4999999999999998e-05, 'epoch': 0.16}
+{'loss': 9.8048, 'grad_norm': 596.7276611328125, 'learning_rate': 2.99e-05, 'epoch': 0.19}
+{'loss': 9.5232, 'grad_norm': 444.8462219238281, 'learning_rate': 3.4899999999999995e-05, 'epoch': 0.23}
+{'loss': 9.2766, 'grad_norm': 1191.4959716796875, 'learning_rate': 3.99e-05, 'epoch': 0.26}
+ 14%|████████████▋                                                                             | 435/3100 [34:52:02<206:29:21, 278.93s/it]
+
+loss stedily decreasing
+{'loss': 7.7029, 'grad_norm': 328.15582275390625, 'learning_rate': 6.97e-05, 'epoch': 0.45}
+{'loss': 7.4801, 'grad_norm': 7245.30078125, 'learning_rate': 7.47e-05, 'epoch': 0.48}
+{'loss': 7.3556, 'grad_norm': 415.07086181640625, 'learning_rate': 7.969999999999999e-05, 'epoch': 0.52}
+ 26%|█████████████████████████████████████████████████████████████▎                                                                                                                                                                          | 819/3100 [64:26:34<175:09:07, 276.43s/it]
+
+Loss around 7, steadily decreasing
+
+Fuck i just realized my warmup step is too much
+Using warmup_ratio=0.03 for train attempt 2
+kept attempt 1 running to see if there is a performance difference
+
+Starting training of Chinese model
+Using exact same hyperparam as attempt 2
+using a different dataset as zh Wikipedia is not large enough
+
+RuntimeError: One of the subprocesses has abruptly died during map operation. During tokenization.
+No idea why
+Dataset tokenized and saved to disk.
+Other gpu now occupied
+
+{'loss': 7.0865, 'grad_norm': 12.794459342956543, 'learning_rate': 0.00010929999999999999, 'epoch': 0.71} for 3000 warm up
+{'loss': 7.0928, 'grad_norm': 14.17914867401123, 'learning_rate': 0.0002843365480545394, 'epoch': 0.16} for 0.03 warmup
+
+Second one clearly better
+I should probably terminate the old one to train the Chinese model
+Attempt 1 and 2 for English model is done
+all loss stuck at 7 dispite different warm up steps
+
+Started training on modern Chinese, 2048 and 512 sample
+dispite same data size and batch size 2048, it has vastly different number of total training steps than English model
+around 40000 for Chinese and 3000 for English
+seemed to be because of the different length of each sample in the dataset
+Chinese sample loss already dropped to 7 for the 512 batch size one
+Maybe batch size too high / step size too low for English model?
+
+Started training on ancient Chinese
+sample size too large for the tokenizer, likely because ancient Chinese have a lot of short passages
+Suffix array seeds 0 / 64024863
+thread '<unnamed>' panicked at ... unigram/trainer.rs:228
+called `Result::unwrap()` on an `Err` value: Internal
+concatenating rows to generate a ds with smaller sample size to see if it works
+
+still reported same error
+reducing batch size of batch iterator
+
+The error Suffix array seeds ... 0 / 21637178 indicates it was trying to track over 21 million unique seed candidates
+Trying modern Chinese again to compare suffix seed
+Training returned error
+
+{'loss': 7.6139, 'grad_norm': 405.338623046875, 'learning_rate': 0.0002967660015548069, 'epoch': 0.08}                            [65/241]
+{'loss': 7.6135, 'grad_norm': 236.82078552246094, 'learning_rate': 0.0002966796233912067, 'epoch': 0.08}
+{'loss': 7.611, 'grad_norm': 285.82904052734375, 'learning_rate': 0.00029659324522760645, 'epoch': 0.08}
+{'loss': 7.6202, 'grad_norm': 338.4360656738281, 'learning_rate': 0.0002965068670640062, 'epoch': 0.08}
+{'loss': 7.6162, 'grad_norm': 503.0112609863281, 'learning_rate': 0.000296420488900406, 'epoch': 0.08}
+{'loss': 7.6222, 'grad_norm': 268.077392578125, 'learning_rate': 0.00029633411073680567, 'epoch': 0.08}
+{'loss': 7.6214, 'grad_norm': 600.4393920898438, 'learning_rate': 0.00029624773257320546, 'epoch': 0.08}
+{'loss': 7.6136, 'grad_norm': 378.2801818847656, 'learning_rate': 0.00029616135440960526, 'epoch': 0.08}
+{'loss': 7.6263, 'grad_norm': 538.0418090820312, 'learning_rate': 0.00029607497624600495, 'epoch': 0.09}
+{'loss': 7.6305, 'grad_norm': 411.5202331542969, 'learning_rate': 0.00029598859808240474, 'epoch': 0.09}
+{'loss': 7.6237, 'grad_norm': 508.4276428222656, 'learning_rate': 0.0002959022199188045, 'epoch': 0.09}
+{'loss': 7.6251, 'grad_norm': 583.8616333007812, 'learning_rate': 0.0002958158417552043, 'epoch': 0.09}
+{'loss': 7.6173, 'grad_norm': 890.1199951171875, 'learning_rate': 0.000295729463591604, 'epoch': 0.09}
+{'loss': 7.6321, 'grad_norm': 1187.3680419921875, 'learning_rate': 0.00029564308542800376, 'epoch': 0.09}
+{'loss': 7.6225, 'grad_norm': 634.9923706054688, 'learning_rate': 0.00029555670726440355, 'epoch': 0.09}
+{'loss': 7.6144, 'grad_norm': 654.058837890625, 'learning_rate': 0.0002954703291008033, 'epoch': 0.09}
+{'loss': 7.6284, 'grad_norm': 618.645263671875, 'learning_rate': 0.00029538395093720303, 'epoch': 0.09}
+{'loss': 7.6281, 'grad_norm': 359.0525207519531, 'learning_rate': 0.00029529757277360283, 'epoch': 0.09}
+{'loss': 7.6069, 'grad_norm': 773.2865600585938, 'learning_rate': 0.00029521119461000257, 'epoch': 0.09}
+{'loss': 7.624, 'grad_norm': 462.6033020019531, 'learning_rate': 0.0002951248164464023, 'epoch': 0.09}
+{'loss': 7.6277, 'grad_norm': 521.35595703125, 'learning_rate': 0.0002950401658460741, 'epoch': 0.09}
+{'loss': 7.6257, 'grad_norm': 1134.0604248046875, 'learning_rate': 0.0002949537876824738, 'epoch': 0.09}
+{'loss': 7.6164, 'grad_norm': 818.8814697265625, 'learning_rate': 0.0002948674095188736, 'epoch': 0.09}
+{'loss': 7.6235, 'grad_norm': 700.0491333007812, 'learning_rate': 0.00029478103135527334, 'epoch': 0.09}
+{'loss': 7.6204, 'grad_norm': 1215.537109375, 'learning_rate': 0.00029469465319167313, 'epoch': 0.09}
+{'loss': 7.6358, 'grad_norm': 1052.5479736328125, 'learning_rate': 0.0002946082750280729, 'epoch': 0.09}
+{'loss': 7.6202, 'grad_norm': 784.896240234375, 'learning_rate': 0.0002945218968644726, 'epoch': 0.1}
+{'loss': 7.6527, 'grad_norm': 806.8931884765625, 'learning_rate': 0.0002944355187008724, 'epoch': 0.1}
+{'loss': 7.6408, 'grad_norm': 761.1585693359375, 'learning_rate': 0.00029434914053727215, 'epoch': 0.1}
+{'loss': 7.634, 'grad_norm': 1067.3175048828125, 'learning_rate': 0.0002942627623736719, 'epoch': 0.1}
+{'loss': 7.6331, 'grad_norm': 1338.5643310546875, 'learning_rate': 0.0002941763842100717, 'epoch': 0.1}
+{'loss': 7.6432, 'grad_norm': 1006.0369873046875, 'learning_rate': 0.00029409000604647143, 'epoch': 0.1}
+{'loss': 7.6383, 'grad_norm': 1038.0433349609375, 'learning_rate': 0.0002940053554461432, 'epoch': 0.1}
+{'loss': 7.6373, 'grad_norm': 930.6856079101562, 'learning_rate': 0.000293918977282543, 'epoch': 0.1}
+{'loss': 7.6474, 'grad_norm': 1694.935302734375, 'learning_rate': 0.0002938325991189427, 'epoch': 0.1}
+{'loss': 7.6468, 'grad_norm': 876.0797119140625, 'learning_rate': 0.00029374622095534246, 'epoch': 0.1}
+{'loss': 7.6429, 'grad_norm': 1397.40087890625, 'learning_rate': 0.00029365984279174225, 'epoch': 0.1}
+{'loss': 7.6568, 'grad_norm': 1127.1302490234375, 'learning_rate': 0.00029357346462814194, 'epoch': 0.1}
+{'loss': 7.6466, 'grad_norm': 1832.7474365234375, 'learning_rate': 0.00029348708646454173, 'epoch': 0.1}
+{'loss': 7.6471, 'grad_norm': 1888.7393798828125, 'learning_rate': 0.0002934007083009415, 'epoch': 0.1}
+{'loss': 7.634, 'grad_norm': 1238.23388671875, 'learning_rate': 0.00029331433013734127, 'epoch': 0.1}
+{'loss': 7.6604, 'grad_norm': 1816.3447265625, 'learning_rate': 0.000293227951973741, 'epoch': 0.1}
+{'loss': 7.6608, 'grad_norm': 1769.552001953125, 'learning_rate': 0.00029314157381014075, 'epoch': 0.1}
+  5%|████▌                                                                                   | 9400/179026 [31:31:22<570:58:16, 12.12s/it]
+Exception in thread Thread-2:
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "albert_sentencepiece_unigram_chinese_fulldata_modelpretrain.py", line 124, in <module>
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 194, in flu
+sh
+    trainer.train()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/transformers/trainer.py", line 2123, in train
+    return inner_training_loop(
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/transformers/trainer.py", line 2548, in _inner_training_loop
+    self._check_worker_status()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 212, in _ch
+eck_worker_status
+    raise exception
+  File "/usr/lib/python3.8/threading.py", line 932, in _bootstrap_inner
+    self._maybe_log_save_evaluate(tr_loss, grad_norm, model, trial, epoch, ignore_keys_for_eval)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/transformers/trainer.py", line 3000, in _maybe_log_save_evaluate
+    self.log(logs)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/transformers/trainer.py", line 3495, in log
+    self.run()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 244, in run
+    self.control = self.callback_handler.on_log(self.args, self.state, self.control, logs)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/transformers/trainer_callback.py", line 511, in on_log
+    self._run()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 275, in _ru
+n
+    self._record_writer.write(data)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/record_writer.py", line 40, in write
+    self._writer.write(header + header_crc + data + footer_crc)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 773, in writ
+e
+    self.fs.append(self.filename, file_content, self.binary_mode)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 167, in appe
+nd
+    return self.call_event("on_log", args, state, control, logs=logs)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/transformers/trainer_callback.py", line 518, in call_event
+    self._write(filename, file_content, "ab" if binary_mode else "a")
+    result = getattr(callback, event)(
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/transformers/integrations/integration_utils.py", line 707, in on_l
+og
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 173, in _wri
+te
+    f.write(compatify(file_content))
+OSError: [Errno 28] No space left on device
+    self.tb_writer.flush()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/torch/utils/tensorboard/writer.py", line 1194, in flush
+    writer.flush()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/torch/utils/tensorboard/writer.py", line 153, in flush
+    self.event_writer.flush()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 125, in flu
+sh
+    self._async_writer.flush()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 194, in flu
+sh
+    self._check_worker_status()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 212, in _ch
+eck_worker_status
+    raise exception
+  File "/usr/lib/python3.8/threading.py", line 932, in _bootstrap_inner
+    self.run()                                                                   
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 244, in run
+    self._run()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 275, in _ru
+n
+    self._record_writer.write(data)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/record_writer.py", line 40, in write
+    self._writer.write(header + header_crc + data + footer_crc)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 773, in writ
+e
+    self.fs.append(self.filename, file_content, self.binary_mode)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 167, in appe
+nd
+    self._write(filename, file_content, "ab" if binary_mode else "a")
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 173, in _wri
+te
+    f.write(compatify(file_content))
+OSError: [Errno 28] No space left on device
+    self.tb_writer.flush()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/torch/utils/tensorboard/writer.py", line 1194, in flush
+    writer.flush()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/torch/utils/tensorboard/writer.py", line 153, in flush
+    self.event_writer.flush()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 125, in flu
+sh
+    self._async_writer.flush()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 194, in flu
+sh
+    self._check_worker_status()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 212, in _ch
+eck_worker_status
+    raise exception
+  File "/usr/lib/python3.8/threading.py", line 932, in _bootstrap_inner
+    self.run()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 244, in run
+    self._run()
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/event_file_writer.py", line 275, in _ru
+n
+    self._record_writer.write(data)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/summary/writer/record_writer.py", line 40, in write
+    self._writer.write(header + header_crc + data + footer_crc)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 773, in writ
+e
+    self.fs.append(self.filename, file_content, self.binary_mode)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 167, in appe
+nd
+    self._write(filename, file_content, "ab" if binary_mode else "a")
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 173, in _wri
+te
+    f.write(compatify(file_content))
+OSError: [Errno 28] No space left on device
+Traceback (most recent call last):
+  File "/home/wenyu/albert_train/albert_env/bin/accelerate", line 8, in <module>
+    sys.exit(main())
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/accelerate/commands/accelerate_cli.py", line 48, in main
+    args.func(args)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/accelerate/commands/launch.py", line 1168, in launch_command
+    simple_launcher(args)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/accelerate/commands/launch.py", line 763, in simple_launcher
+    raise subprocess.CalledProcessError(returncode=process.returncode, cmd=cmd)
+subprocess.CalledProcessError: Command '['/home/wenyu/albert_train/albert_env/bin/python3', 'albert_sentencepiece_unigram_chinese_fulldata
+_modelpretrain.py']' returned non-zero exit status 1.
+wenyu@dsail4:~/albert_train/chinese_clean_passages_80m_9gb_sentencepiece_unigram/train_attempt2_effectiveBatch512$ export PYTORCH_CUDA_ALL
+OC_CONF=expandable_segments:True                  
+
+Ran out of disk space but there's plenty of space left
+Training on Chinese continued
+zh_train_attempt1_effectiveBatch2048 at 1% loss = 8.4
+zh_train_attempt3_effectiveBatch1024 at 1% loss = 8.3
+estimated remaining time 26 days
+
+Tokenizer failed again
+Try reducing text dataset size
+
+5gb works
+But vocab size not enough
+shit
+
+Loading datasets...
+Resolving data files: 100%|███████████████████████████████████████████████████████████████████████████████| 25/25 [00:04<00:00,  5.34it/s]
+Loading dataset shards: 100%|█████████████████████████████████████████████████████████████████████████████| 18/18 [00:00<00:00, 24.98it/s]
+Datasets loaded.
+Dataset shuffled.
+Selecting 9GB of raw training text...
+Selecting ~3.22B characters...
+ 53%|████████████████████████████████████████████                                       | 65959334/124339496 [00:17<00:15, 3684617.64it/s]
+Selected 65959335 samples.
+Selecting ~1.79B characters...
+ 29%|████████████████████████▍                                                          | 36636665/124339496 [00:09<00:23, 3687300.52it/s]
+Selected 36636666 samples.
+Dataset selection completed.
+Finished selecting ~9GB dataset.
+Final sample count: 65959335
+================== Stage 2: Preparing Tokenizer ==================
+Loading pretrained tokenizer...
+Pretrained tokenizer loaded.
+Special tokens: ['[CLS]', '[SEP]', '<unk>', '<pad>', '[MASK]']
+Training new tokenizer...
+Traceback (most recent call last):
+  File "albert_sentencepiece_unigram_ancientchinese_fulldata_tokenizertrain.py", line 142, in <module>
+    text_iterator=batch_iterator(dataset=acnientchinese_1GB),
+NameError: name 'acnientchinese_1GB' is not defined
+Traceback (most recent call last):
+  File "/home/wenyu/albert_train/albert_env/bin/accelerate", line 8, in <module>
+    sys.exit(main())
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/accelerate/commands/accelerate_cli.py", line 48, in main
+    args.func(args)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/accelerate/commands/launch.py", line 1168, in launch_command
+    simple_launcher(args)
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/accelerate/commands/launch.py", line 763, in simple_launcher
+    raise subprocess.CalledProcessError(returncode=process.returncode, cmd=cmd)
+subprocess.CalledProcessError: Command '['/home/wenyu/albert_train/albert_env/bin/python3', 'albert_sentencepiece_unigram_ancientchinese_fulldata_tokenizertrain.py']' returned non-zero exit status 1.
+wenyu@dsail4:~/albert_train/ancientchinese_wenyangpt_9gb_sentencepiece_unigram/tokenized_text$ python albert_sentencepiece_unigram_ancientchinese_fulldata_tokenizertrain.py
+================== Stage 1: Starting Dataset Preparation ==================
+Loading datasets...
+Resolving data files: 100%|███████████████████████████████████████████████████████████████████████████████| 25/25 [00:04<00:00,  5.54it/s]
+Loading dataset shards: 100%|█████████████████████████████████████████████████████████████████████████████| 18/18 [00:00<00:00, 25.00it/s]
+Datasets loaded.
+Dataset shuffled.
+Selecting 9GB of raw training text...
+Selecting ~3.22B characters...
+ 53%|████████████████████████████████████████████                                       | 65959334/124339496 [00:17<00:15, 3723771.88it/s]
+Selected 65959335 samples.
+Selecting ~1.79B characters...
+ 29%|████████████████████████▍                                                          | 36636665/124339496 [00:09<00:23, 3711466.26it/s]
+Selected 36636666 samples.
+Dataset selection completed.
+Finished selecting ~9GB dataset.
+Final sample count: 65959335
+================== Stage 2: Preparing Tokenizer ==================
+Loading pretrained tokenizer...
+Pretrained tokenizer loaded.
+Special tokens: ['[CLS]', '[SEP]', '<unk>', '<pad>', '[MASK]']
+Training new tokenizer...
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████| 3664/3664 [10:23<00:00,  5.88it/s]
+[00:11:30] Pre-processing sequences       ████████████████████████████████████████████████████████████████████████████ 0        /        0[00:20:02] Suffix array seeds             ████████████████████████████████████████████████████████████████████████████ 37428886 / 37428886
+Traceback (most recent call last):
+  File "albert_sentencepiece_unigram_ancientchinese_fulldata_tokenizertrain.py", line 141, in <module>
+    my_albert_tokenizer = pretrained_tokenizer.train_new_from_iterator(
+  File "/home/wenyu/albert_train/albert_env/lib/python3.8/site-packages/transformers/tokenization_utils_fast.py", line 829, in train_new_from_iterator
+    tokenizer.train_from_iterator(text_iterator, length=length, trainer=trainer)
+Exception: The vocabulary is not large enough to contain all chars
+
+Estimate num unique char of ancient Chinese ds
+session check_unique_char
+Total Unique Characters: 43064, while vocab size is 30000
+
+both Chinese model loss stuck at 7
+
+Some tensor board screen shots are attached too

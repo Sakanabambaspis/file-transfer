@@ -1,0 +1,1641 @@
+This is the resume bullet points. Treat these as the most truthful and the details need to support them:
+• 独立架构基于python的高并发自动化数据抓取系统,利用queue 与threading部署20+并发工作节点以优化吞吐量;
+通过逆向工程拦截未公开后端api,直接提取嵌套json负载以绕过dom渲染,显著降低计算开销与采集延迟。
+• 针对复杂动态渲染与底层反爬机制,集成undetected_chromedriver绕过cloudlare 严苛防护与captcha验证;
+设计完善的容错及多级重试策略,稳定从国际级数据源提取超7,000个高维数据点。
+• 研发基于pandas 的高效etl数据清洗管道,自动化执行空值插补、目录级去重与异常边界值剔除;将海量非结构化文本转化为高度结构化的json/csv格式,为下游量化分析与机器学习模型训练提供高可靠、零脏数据的底层输入。
+
+This is a rough work diary:
+# 北京健康有益后端助理工程师
+
+Day 1:
+学习爬虫，收集https://www.dm.de/食品信息
+
+学习beautifulsoup, selenium web driver
+
+复建python
+
+Day2:
+
+继续学习，练习代码，学习不同爬虫方式，webdriver，api，html
+
+Day3：
+
+学习导出csv
+
+完成主页爬取，收集产品链接并分类储存
+
+Day4：
+
+学习pandas，json
+
+编程产品信息爬虫
+
+Day5:
+
+完成dm爬虫任务，文件输出csv并分类
+
+1647 条element
+
+Day6:
+
+彬哥很忙，等待下一步任务
+
+了解opencv，nltk，transformer
+
+进一步学习爬虫方法
+
+Day7：
+新爬虫任务，[p24.by](http://p24.by/)，提取食品信息输出xlsx
+
+完成标题，标题提取容量/质量，食品信息，食品类别，图片链接提取
+
+完成爬虫主要功能，整合信息，导出信息
+
+完成null信息处理
+
+因为赶工未完成exception handling
+
+Day8:
+
+完成面包和烘焙品爬虫
+
+发现很多bug，完成exception handling：image not found，404，空title，empty webpage
+
+尝试threading，感觉很不戳，目前没被封
+
+完成p24数据爬取
+
+新任务，爬取4251条图片并下载：墨西哥首图图片下载.xlsx
+
+完成，并导出zip
+
+自动化排障，检查数字与其连续性
+
+This is the code:
+
+dm crawler.py
+#cannot handle cockies window, operate manually
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.common.action_chains import ActionChains
+import time
+
+#define constants
+PRODUCT_CATEGORY = 'Beverages'
+MAX_WAIT_TIME = 10
+
+#options to ignore handshake error
+options = webdriver.ChromeOptions()
+options.add_argument('--ignore-certificate-errors')
+options.add_argument('--ignore-ssl-errors')
+options.add_argument('--log-level=3')
+
+#create driver object with above options, visit target webpage
+dm_driver = webdriver.Chrome(options=options)
+dm_driver.get('https://www.dm.de/ernaehrung/getraenke') 
+
+#create actions
+dm_driver_action = ActionChains(dm_driver)
+
+#Food -> Breakfast -> https://www.dm.de/ernaehrung/fruehstueck 227 
+#Food -> Coffee, tea & cocoa -> https://www.dm.de/ernaehrung/kaffee-tee-kakao
+#Food -> Milk & Milk Alternatives -> https://www.dm.de/ernaehrung/milch-milchalternativen 37
+#Food -> Tofu & Meat Substitute -> https://www.dm.de/ernaehrung/tofu-fleischersatz 23 
+#Food -> Supplements -> https://www.dm.de/ernaehrung/beilagen
+#Food -> Sauce & Spices -> https://www.dm.de/ernaehrung/sosse-gewuerze 133 
+#Food -> Ready meals & canned food -> https://www.dm.de/ernaehrung/fertiggerichte-konserven 97
+#Food -> Bake -> https://www.dm.de/ernaehrung/backen 130 
+#Food -> Snacks & Sweets -> https://www.dm.de/ernaehrung/snacks-und-suessigkeiten
+#Food -> Sports nutrition -> https://www.dm.de/ernaehrung/sportnahrung
+#Food -> Beverages -> https://www.dm.de/ernaehrung/getraenke
+#Food -> https://www.dm.de/ernaehrung
+
+
+try:
+
+    #build product-grids element list, get length of list
+    print('Locating product grids...')
+    product_grids = WebDriverWait(dm_driver,  MAX_WAIT_TIME).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, '.ps_query-grid-container-EXwoX'))) #find all product grids by css selector
+    product_grids_len = len(product_grids) #calculate # of grids present
+    
+    print(str(product_grids_len) + ' Product grid(s) found') #debugging
+
+
+    product_grid = product_grids[product_grids_len - 1] # we are interested in the last grid
+
+
+
+    #Button xpath: .//*[@id="load-more-products-button"]
+    #Product tile css: .pdd_nxqq5u0
+
+
+    while True:
+        #identify and click button
+        try:
+            #identify first button through xpath
+            print('Locating buttons...')
+            button_load_more = WebDriverWait(product_grid,  MAX_WAIT_TIME).until(EC.element_to_be_clickable((By.XPATH, './/*[@id="load-more-products-button"]')))
+            print('Button found, clicking...')
+
+            #click if found, and wait for loading
+            button_load_more.click()
+            WebDriverWait(product_grid,  MAX_WAIT_TIME).until(EC.element_to_be_clickable((By.XPATH, './/*[@id="load-more-products-button"]'))) #continue after another button has loaded or timeout
+        
+        #break loop if no button found
+        except:
+            # try:
+            #     print('Button detection paused, checking cookies...')
+            #     container_accept_cookie = WebDriverWait(dm_driver, MAX_WAIT_TIME).until(EC.presence_of_element_located((By.ID, 'uc-center-container')))
+            #     button_accept_cookie = WebDriverWait(container_accept_cookie, MAX_WAIT_TIME).until(EC.element_to_be_clickable((By.TAG_NAME, 'button')))                
+            #     print('Cookies found, accepting cookies...')
+            #     button_accept_cookie.click()
+            #     time.sleep(5)
+            # except:
+                print('No more buttons')
+                break
+        
+
+    #build a list of all product tiles present in the grid
+    #while True loop to prevent cookie
+    while True:
+        try:
+            print('Locating tiles...')
+            product_tiles = product_grid.find_elements(By.CSS_SELECTOR, '.pdd_nxqq5u0')
+            print(str(len(product_tiles)) + " tiles found")
+            break
+        except NoSuchElementException:
+            # try:
+            #     print('Button detection paused, checking cookies...')
+            #     container_accept_cookie = WebDriverWait(dm_driver, MAX_WAIT_TIME).until(EC.presence_of_element_located((By.ID, 'uc-center-container')))
+            #     button_accept_cookie = WebDriverWait(container_accept_cookie, MAX_WAIT_TIME).until(EC.element_to_be_clickable((By.TAG_NAME, 'button')))
+            #     print('Cookies found, accepting cookies...')
+            #     button_accept_cookie.click()
+            #     time.sleep(5)
+                
+            # except:
+                print("No more tiles")
+                break
+    
+    #write file
+    print('Writing file...')
+    filelinks = open(f'dm_{PRODUCT_CATEGORY}_links_({len(product_tiles)} items).txt', 'w', encoding = 'utf-8')
+
+    #extract all links from located tiles and close file
+    for product_tile in product_tiles:
+        link = product_tile.find_element(By.TAG_NAME, 'a')
+        filelinks.write(link.get_attribute('href') + '\n')
+    filelinks.close()
+    print('File written')
+    
+except:
+    print('No product grid found')
+#close browser
+finally:
+    print('Exiting browser...')
+    dm_driver.close()
+
+dm product page crawler - automated.py
+import csv
+import json
+import requests
+from bs4 import BeautifulSoup
+import re
+import pandas
+import os
+
+def extract_product_id(url):
+    """
+    Extracts the product ID from a DM.de product URL.
+    Returns the ID without the leading 'p' or None if not found.
+    """
+    # Pattern to match the product ID (p followed by numbers at the end before .html)
+    pattern = r'p(\d+)\.html$'
+    
+    # Search for the pattern in the URL
+    match = re.search(pattern, url)
+    
+    if match:
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print(f"Original URL: {url}")
+        print(f"Extracted Product ID: {match.group(1)}")
+        return match.group(1)  # Return the digits without the 'p'
+    print("No product ID found")
+    return None
+
+
+folder_path = r'D:\VSCode Folder\python\healthhope\dm crawler\product link files'
+
+# List all files and directories in the specified path
+entries = os.listdir(folder_path)
+
+for link_file in entries:
+
+    print(f'##############################\nBeginning operation on [{link_file}]\n##############################')
+    #extract file name and use as category
+    product_category = os.path.splitext(link_file)[0]
+    link_file_path = folder_path + '/' + link_file
+
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    # DEFINE FOLLOWING BEFORE EXECUTING:
+    # DEFINE FOLLOWING BEFORE EXECUTING:
+    # DEFINE FOLLOWING BEFORE EXECUTING:
+
+    file_save_path = r'D:\VSCode Folder\python\healthhope\dm crawler\product page crawler\dm_product_info'
+    
+    # The program will create the following files:
+    #   1. A csv containing all product info
+    #   2. A folder containing all original product json
+
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    if file_save_path == '':
+        print('Error: file_save_path not defined')
+        exit(1)
+    if link_file_path == '':
+        print('Error: link_file_path not defined')
+        exit(2)
+
+    print('Checking file_save_path validity...')
+    if os.path.exists(file_save_path):
+        print('file_save_path valid')
+    else:
+        print('Error: invalid file_save_path')
+        exit(3)
+
+    print('Checking link_file_path validity...')
+    if os.path.isfile(link_file_path):
+        print('link_file_path valid')
+    else:
+        print('Error: invalid link_file_path')
+        exit(4)
+
+
+
+    #open link file
+    with open(link_file_path, 'r', encoding='utf-8') as links_file:
+
+        #set headers to simulate browser requests
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"
+        }
+
+        # Define field names
+        field_names = ['序号', '品牌', '产品名称', '图片链接', '产品介绍', '产品功能', '原料', '营养成分']
+
+        #create dataframe
+        print('Creating dataframe...')
+        products_dataframe = pandas.DataFrame(columns=field_names)
+        print('Dataframe created')
+
+        for url_index, product_url in enumerate(links_file):
+
+            # extract id from url and save the json from api request
+            id = extract_product_id(product_url)
+            print(f'Beginning extraction from URL [{url_index}]')
+            print('Requesting API...')
+            product_page_json = json.loads(requests.get(f'https://products.dm.de/product/DE/products/detail/gtin/{id}', headers=headers).text)
+            # product_page_json = json.loads(requests.get('https://products.dm.de/product/DE/products/detail/gtin/4048517783500', headers=headers).text) # debugging request for visiting specific api
+            print('API requested')
+
+            # directly retrieve and save brand and product name from json
+            print('Searching brand and product names...')
+            brand_name = product_page_json['title']['brand']
+            print(f'Brand name found: [{brand_name}]')
+            product_name = product_page_json['title']['headline']
+            print(f'Product name found: [{product_name}]')
+
+            # search through images block and retrieve save all images into a list
+            print('Searching product images...')
+            image_url_list = list()
+            for i, image in enumerate(product_page_json['images']):
+                image_url_list.append(image['src'])
+                print(f'Image {i} added to the list: {image_url_list[i]}')
+
+            print('Searching attributes...')
+
+            #initializing as none
+            description_list = None
+            features = None
+            ingrediants = None
+            nutrition_table = None
+
+            #loop through and check each content block
+            for content_block in product_page_json['descriptionGroups']:
+
+                # save content block as description if header matches
+                if content_block['header'] == 'Produktbeschreibung': # Produktbeschreibung = Product description
+                    print('Product description found') 
+                    print('Extracting content...') 
+                    try:
+                        description_list = content_block['contentBlock'][0]# extract description json
+                    except:
+                        print('No content found in description') 
+                        description_list = [None]
+
+                # save content block as features if header matches
+                if content_block['header'] == 'Produktmerkmale': # Produktmerkmale = Product features
+                    print('Product features block found')
+                    print('Extracting content...') 
+                    features = content_block['contentBlock'][0]['descriptionList'][0]['description'] # extract features string
+
+                # save content block as ingrediants if header matches
+                if content_block['header'] == 'Zutaten': # Zutaten = Ingrediant list
+                    print('Ingrediant block found')
+                    print('Extracting content...')
+                    try:
+                        ingrediants = content_block['contentBlock'][0] # extract ingrediants json
+                    except:
+                        print('No content found in ingrediants') 
+                        ingrediants = [None]
+                
+                # save content block as nutrition if header matches
+                if content_block['header'] == 'Nährwerte': # Nährwerte = nutrition
+                    print('Nutritional attributes block found')
+                    nutrition_table = content_block['contentBlock'][0]['table'] # extract key nutrition table as a dictionary
+                    print(f'[{len(nutrition_table)}] nutritional attributes found')
+
+            # Brand saved as str
+            # Name saved as str
+            # Image saved as a list of str
+            # Description saved as json
+            # Features saved as json
+            # Ingrediants saved as json
+            # Nutrients saved as json
+
+            # #storing brand and name in dataframe
+            # products_dataframe.at[0,'Brand'] = brand_name
+            # products_dataframe.at[0,'Name'] = product_name  
+
+            # saving data to json
+            data = {
+                '序号': url_index,
+                '品牌': brand_name,
+                '产品名称': product_name,
+                '图片链接': [json.dumps(image_url_list)],
+                '产品介绍': [json.dumps(description_list)],
+                '产品功能': features,
+                '原料': [json.dumps(ingrediants)],
+                '营养成分': [json.dumps(nutrition_table)]
+            }
+
+            print(f'Saving [{product_name}] to dataframe...')
+            #create dataframe with data for concatination
+            new_entry = pandas.DataFrame(data)
+            products_dataframe = pandas.concat([products_dataframe, new_entry], ignore_index=True)
+            print(f'[{product_name}] saved to dataframe')
+
+            
+            #create save path
+            print('Creating file path...')
+            save_path = f'{file_save_path}/{product_category}/{url_index}.json'
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            print('Path created')
+            
+            # writing file
+            print('Creating JSON file...')
+            with open(save_path, 'w', encoding='utf-8-sig') as json_file:
+                print('Saving JSON file...')
+                json_file.write(json.dumps(product_page_json))
+                print(f'JSON saved: [{json_file.name}]')
+
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            # break # break line for debugging
+
+
+    #save final result to csv
+    print(f'Saving file...')
+    products_dataframe.to_csv(f'{file_save_path}/{product_category}/{product_category}_product_info_csv.csv', encoding='utf-8-sig', index=False)
+    print(f'File saved: [{product_category}_product_info_csv.csv]')
+
+generate utf-8 csv.py
+
+import pandas as pd
+
+# Definieren des Arrays
+data = [
+    ["Durchschnittliche Nährwertangaben", "Brennwert", "Fett", "davon gesättigte Fettsäuren", 
+     "davon einfach ungesättigte Fettsäuren", "davon mehrfach ungesättigte Fettsäuren", 
+     "Kohlenhydrate", "davon Zucker", "davon mehrwertige Alkohole", "Ballaststoffe", "Eiweiß", 
+     "Salz", "Vitamin A", "Vitamin B 6", "Biotin", "Folsäure", "Niacin", "Pantothensäure", 
+     "Vitamin B 12", "Vitamin C", "Vitamin D", "Vitamin E", "Vitamin K"],
+    [100, 400, 10, 5, 3, 2, 50, 10, 0, 5, 15, 1, 1000, 0.2, 10, 200, 15, 10, 2, 50, 0.1, 10, 1],
+    [200, 800, 20, 10, 6, 4, 70, 15, 0, 10, 20, 2, 2000, 0.4, 20, 400, 30, 20, 4, 100, 0.2, 20, 2]
+]
+
+# Extrahieren der Spaltennamen (erste Zeile des Arrays)
+columns = data[0]
+
+# Erstellen eines DataFrames ohne die ersten beiden Zeilen (Spaltennamen und erste Datenzeile)
+df = pd.DataFrame(data[1:], columns=columns)
+
+# Speichern des DataFrames in eine CSV-Datei
+df.to_csv('naehrwerte_mit_kopf.csv', index=False, encoding='utf-8-sig')
+
+print("Die CSV-Datei wurde erfolgreich als 'naehrwerte_mit_kopf.csv' im aktuellen Verzeichnis gespeichert.")
+
+img scraper.py
+import requests
+import mimetypes
+import os
+from urllib.parse import urlparse
+from threading import Thread
+from openpyxl import load_workbook, Workbook
+from queue import Queue
+import threading
+from fake_useragent import UserAgent
+from threading import Thread
+
+headers = {
+    'User-Agent': UserAgent().chrome
+}
+    
+def download_image_bot():
+
+    while not queue.empty():
+
+        tuple = queue.get()
+        url = tuple[0]
+        id = tuple[1]
+
+        try:
+            response = requests.get(url, headers=headers, timeout=20, verify=False)
+        except:
+            print('Error: [' + str(response.status_code) + '], exiting')
+            print('Img: ' + str(id))
+            exit()
+
+        if response.status_code == 200:
+            # 获取 Content-Type
+            content_type = response.headers.get('Content-Type')
+            
+            if content_type:
+                # 使用 mimetypes 获取扩展名
+                ext = mimetypes.guess_extension(content_type)
+            else:
+                parsed_url = urlparse(url)
+                path = parsed_url.path
+                ext = os.path.splitext(path)[1]
+            
+            save_path = os.path.join(save_folder, f'{id}{ext}')
+        
+            with open(save_path, 'wb') as file:
+                file.write(response.content)
+            print(f"图片已成功下载并保存为 {save_path}")
+        else:
+            print("下载失败")
+
+        
+
+workbook = load_workbook(r'D:\VSCode Folder\python\healthhope\img scraper\墨西哥首图图片下载.xlsx')
+worksheet = workbook['Sheet1']
+
+save_folder = r'D:\VSCode Folder\python\healthhope\img scraper\save folder'
+
+queue = Queue()
+for row in worksheet.iter_rows(min_col=1, max_col=3, min_row=1155, values_only=True):
+    queue.put([row[0], row[2]])
+
+for i in range(20):
+    threads = Thread(target=download_image_bot)
+    threads.start()
+
+
+p24.by main crawler.py
+import requests
+import regex
+from pathlib import Path
+from bs4 import BeautifulSoup
+
+LINK_MAIN = r'https://p24.by'
+FILE_SAVE_PATH = r'D:\VSCode Folder\python\healthhope\p24.by crawler\p24.by artifacts'
+CATEGORY_EXTRACT_PATTERN = r'g\/(.*)\/'
+
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"
+}
+
+# Opening link file for category page for reference
+print('Opening link file...')
+with open(r'D:\VSCode Folder\python\healthhope\p24.by crawler\main page crawler\p24.by_category_links.txt', 'r', encoding='utf-8') as category_links:
+    print('File opened')
+
+    # Iterate through all links
+    for line in category_links:
+
+        # Create new path to store extracted links
+        category_text = regex.search(CATEGORY_EXTRACT_PATTERN, line).group(1)
+        print(f'Category: [{category_text}]')
+        print('Creating path...')
+        Path(FILE_SAVE_PATH + r'/' + category_text).mkdir(parents=True, exist_ok=True)
+        print('Path created')
+        
+        # Create new file to store extracted links
+        print('Creating file...')
+        product_link_file = open(FILE_SAVE_PATH + r'/' + category_text + r'/' + category_text + '.csv', 'w', encoding='utf-8') # Create file
+
+        # Process and access link
+        category_link = line.strip() # Strip the \n at the end
+        print(f'Acessing link: {category_link}')
+        response_p24by = requests.get(category_link, headers=headers) # Request drom the processed link
+        html_p24by = response_p24by.text # Extract html from response
+        print('Link opened')
+
+        print('Parsing...')
+        soup_p24by = BeautifulSoup(html_p24by, 'html.parser') # Parse
+
+        # Product list class: catalog-product-list preloader-list ajax-filter-result
+        # Product pannel class: product-card-wrap product-card-js catalog-panel__item ajax-nav-item catalog-item
+
+        # Find all product panels in the page
+        print('Searching for product panels...')
+        product_panels = soup_p24by.find_all('div', class_ = 'product-card-wrap product-card-js catalog-panel__item ajax-nav-item catalog-item')
+        
+        # Iterate through the panels and find link
+        print('Product panels found, iterating...')
+        for product_panel in product_panels:
+            tag_link = product_panel.find('a')['href']
+            print('Link found: ' + LINK_MAIN + f'{tag_link}')
+            product_link_file.write(tag_link + '\n')
+            
+        # Next button class: paginations__item paginations__item--first paginations__item--last        
+        # Use the following:
+        #   len(soup_p24by.find_all('li', class_ = 'paginations__item paginations__item--first paginations__item--last'))
+        # To detect if there are more pages
+        # > 0 then next button exist, thus more page exist
+
+        print('Page completed')
+
+        page_counter = 2 # Counter statrt from page 2
+        while len(soup_p24by.find_all('li', class_ = 'paginations__item paginations__item--first paginations__item--last')) > 0:
+            
+            # Visit new page
+            print(f'Visit new page [{page_counter}]...')
+            response_p24by = requests.get(category_link + '?PAGEN_1=' + str(page_counter), headers=headers) # Request drom the processed link
+            html_p24by = response_p24by.text # Extract html from response
+            print(f'Page {page_counter} opened')
+
+            print('Parsing...')
+            soup_p24by = BeautifulSoup(html_p24by, 'html.parser') # Parse
+
+            # Product list class: catalog-product-list preloader-list ajax-filter-result
+            # Product pannel class: product-card-wrap product-card-js catalog-panel__item ajax-nav-item catalog-item
+
+            # Find all product panels in the page
+            print(f'Searching for product panels on page {page_counter}...')
+            product_panels = soup_p24by.find_all('div', class_ = 'product-card-wrap product-card-js catalog-panel__item ajax-nav-item catalog-item')
+
+            # Iterate through the panels and find link
+            print('Product panels found, iterating...')
+            for product_panel in product_panels:
+                tag_link = product_panel.find('a')['href']
+                print('Link found: ' + LINK_MAIN + f'{tag_link}')
+                product_link_file.write(tag_link + '\n')
+
+            print(f'Page [{page_counter}] completed')
+
+            page_counter += 1 # Increment counter
+
+        print(f'Category {category_text} links saved')
+        print(f'Closing file {category_text}.csv...')
+        product_link_file.close()
+
+print('All category visited')
+
+p24.by product page crawler - 副本.py
+import requests
+import regex
+from pathlib import Path
+from bs4 import BeautifulSoup
+import pandas
+import os
+from fake_useragent import UserAgent
+from urllib.parse import urlparse, urljoin
+
+# amend src to get working url
+def return_img_url(original_src):
+
+    print('Processing image url')
+    try:
+        image_suffix = regex.search(r'upload\/(.*)', original_src).group(1) # extract suffix
+        image_url = 'https://p24.by/upload/' +  image_suffix
+        print(f'URL: {image_url}')
+        return image_url# combine to form working url
+    except:
+        print('Error: image url processing error')
+        return None
+    
+# get_image_url
+def get_image_url(product_page_soup):
+
+    print('Locating image container...')
+    image_parent = product_page_soup.find('div', class_ = 'swiper-wrapper') # find parent of image
+    if image_parent == None:
+        print('No container found')
+        return None
+    print('Matching ontainer found')
+
+    print('Locating image...')
+    image = image_parent.find('img') # find image from parent
+    print('Searching image src...')
+    src = image.get('src') # Search for src
+    if src == None:
+        print('Src not found')
+        return None
+    image_url = return_img_url(src) # extract src and combine to form url
+    if image_url == None:
+        print('No image found')
+        return None
+
+    print('Return image')
+    return image_url 
+
+# get_title_text
+def get_title_text(product_page_soup):
+    print('Locating title...')
+    try:
+        return product_page_soup.find('h1').get_text(strip = True) # locate title, and return stripped text content
+    except:
+        None
+
+def get_measurement(title):
+    try:
+        return regex.search(r'(\d+\s?г|\d+\s?кг|\d+\s?мл|\d+\s?л)', title).group(1)
+    except:
+        return None
+
+# get_description_dictionary
+def get_description_dictionary(product_page_soup):
+    # product_description -> find all product-features__item -> return product-features__prop + product-features__val
+    print('Identifying product_description...')
+    product_description = product_page_soup.find('div', class_ = 'product-page__description')
+    if product_description == None:
+        print('Description not found')
+        return {}
+    product_description_items = product_description.find_all('div', class_ = 'product-features__item')
+
+    print('Number of description found: ' + str(len(product_description_items)))
+    print('Saving description do dictionary')
+
+    product_description_dictionary = {} # Create empty dictionary
+
+    # Iterate all items
+    for product_description_item in product_description_items:
+
+        # Find key and value
+        Key = product_description_item.find('div', class_ = 'product-features__prop').get_text(strip=True)
+        Value = product_description_item.find('div', class_ = 'product-features__val').get_text(strip=True)
+
+        # Check if there is 'producer' value is location or name
+        if Key == 'Производитель':
+            if len(regex.findall(r'\s*', Value)) > 2 and len(regex.findall('[,.]', Value)) > 2:
+                Key = 'Производитель (地址)'
+
+
+        # Save to dic
+        product_description_dictionary[Key] = Value
+        # print('Saved ' + f'[{Key}: {Value}]')
+
+    return product_description_dictionary
+
+def get_category_name(name):
+    # 定义链接到中文的映射表
+    category_map = {
+        "cross-food": "混合食品",
+        "ovoshchi-frukty-i-yagody": "蔬菜水果和浆果",
+        "khleb-i-vypechka": "面包和烘焙品",
+        "molochnaya-produktsiya-i-yaytsa": "乳制品与鸡蛋",
+        "myaso-ptitsa-i-kolbasy": "肉类禽类与香肠",
+        "ryba-ikra-i-moreprodukty": "鱼类鱼子酱与海鲜",
+        "voda-soki-i-napitki": "水果汁与饮料",
+        "chipsy-sneki-sukhariki-i-popkorn": "薯片零食脆饼与爆米花",
+        "chay-kofe-i-kakao": "茶咖啡与可可",
+        "sladosti-i-deserty": "糖果与甜点",
+        "zdorovoe-pitanie": "健康饮食",
+        "bakaleya2": "杂货",
+        "konservy-salaty-ketchupy-i-sousy": "罐头沙拉番茄酱与调味料",
+        "zamorozhennye-produkty": "冷冻食品",
+        "detskoe-pitanie": "婴幼儿食品",
+        "zootovary": "宠物用品"
+    }
+
+    return category_map.get(name.strip(), "未知分类")
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+
+headers = {
+    'User-Agent': UserAgent().chrome
+}
+FILE_SAVE_PATH = r'D:\VSCode Folder\python\healthhope\p24.by crawler\product page crawler\product xlsx'
+FOLDER_PATH = r'D:\VSCode Folder\python\healthhope\p24.by crawler\product page crawler\links cleaned 2'
+
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+if not os.path.exists(FILE_SAVE_PATH):
+        print(f"{FILE_SAVE_PATH} Does not exist")
+        exit(1)
+
+for link_file in os.listdir(FOLDER_PATH):
+
+    # Separator
+    print('===================================================================')
+
+    # Create dataframe
+    print('Initializing dataframe...')
+    dataframe = pandas.DataFrame()
+
+    # open link file to read product links
+    with open(os.path.join(FOLDER_PATH, link_file), 'r', encoding='utf-8') as product_links_file:
+
+        filename_only = os.path.splitext(os.path.basename(product_links_file.name))[0]
+        print('Opening file ' + filename_only + '...')
+        print('Identifying food category...')
+        category = get_category_name(filename_only)
+        print(category)
+
+        # Iterate though all lines in the file
+        for index, incomplete_product_page_link in enumerate(product_links_file):
+
+            # separator
+            print('-------------------------------------------------------------------')
+
+            # Process link format 
+            product_page_link = r'https://p24.by' + incomplete_product_page_link.strip()
+            # product_page_link = r'https://p24.by/product/26738-postnaya-perlovka-so-svezhimi-shampinonami-1kg-belarus/' # debugging option
+
+            # Requesting from product link
+            print('Performing scraping on product #' + str(index))
+            print('Requesting from ' + product_page_link)
+            try:
+                product_response = requests.get(product_page_link, headers=headers) 
+            except:
+                print('Error, invalid link, skipping...')
+                continue
+
+            # 404 handling
+            if product_response.status_code == 404:
+                print("404 Error: Page not found.")
+                continue
+
+            # parse
+            product_html = product_response.text
+            print('Requested')
+            print('Parsing...')
+            product_page_soup = BeautifulSoup(product_html, 'html.parser')
+            print('Parsed, scraping...')
+
+            # Retrieve date using pre defined function
+            print('Extracting title...')
+            title = get_title_text(product_page_soup)
+            if title == 'Каталог':
+                print('Page empty, skipping...')
+                continue
+            print('Extracting quantity...')
+            measurement = get_measurement(title)
+            print('Extracting image url...')
+            image_url = get_image_url(product_page_soup)
+            
+            # Create top of dictionary
+            print('Creating top of dict...')
+            item_dict_top = {
+                '产品链接': product_page_link,
+                '产品名': title,
+                '质量/容量': measurement,
+                '图片URL': image_url
+            }
+            print('Top of dict complete')
+
+            # 上下拼接，保留所有列（join='outer' 是默认值）
+            # item_dataframe = pandas.DataFrame(get_description_dictionary(product_page_soup))
+            # dataframe = pandas.concat([dataframe, item_dataframe], ignore_index=True)
+            print('Scraping item description for bot of dic...')
+            item_dict_bottom = get_description_dictionary(product_page_soup)
+            print('Scraped, merging dic...')
+            item_dict = item_dict_top | item_dict_bottom # Merge top and bot dict
+
+            # check dic validity
+            if not item_dict:
+                print("Dictionary is empty, skipping...")
+                continue
+            if item_dict and all(v is None for v in item_dict.values()):
+                print("Dictionary is not empty and all values are None, skipping...")
+                continue
+
+            print('Merged, transfering data to dataframe from dic...')
+            item_dataframe = pandas.DataFrame([item_dict])  # 包裹成列表，防止 scalar 错误
+            dataframe = pandas.concat([dataframe, item_dataframe], ignore_index=True)
+            print('Data transfered')
+
+            print('-------------------------------------------------------------------')
+            # exit() # debugging option
+
+    print(f'All product info in file {category} saved to dataframe')
+    print('Exporting dataframe to xlsx...')
+    dataframe.to_excel(FILE_SAVE_PATH + '\\' + category + '.xlsx',index=False)
+    print(f'{category}: Exported dataframe to xlsx')
+    print('===================================================================')
+
+print('All pages completed, exit program')
+
+p24.by product page crawler.py
+import requests
+import regex
+from pathlib import Path
+from bs4 import BeautifulSoup
+import pandas
+import os
+from fake_useragent import UserAgent
+from urllib.parse import urlparse, urljoin
+from threading import Thread
+from queue import Queue
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+
+headers = {
+    'User-Agent': UserAgent().chrome
+}
+FILE_SAVE_PATH = r'D:\VSCode Folder\python\healthhope\p24.by crawler\product page crawler\product xlsx'
+FOLDER_PATH = r'D:\VSCode Folder\python\healthhope\p24.by crawler\product page crawler\links cleaned 1'
+
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+# DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING DEFINE BEFORE EXECUTING
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+# amend src to get working url
+def return_img_url(original_src):
+
+    print('Processing image url')
+    try:
+        image_suffix = regex.search(r'upload\/(.*)', original_src).group(1) # extract suffix
+        image_url = 'https://p24.by/upload/' +  image_suffix
+        print(f'URL: {image_url}')
+        return image_url# combine to form working url
+    except:
+        print('Error: image url processing error')
+        return None
+    
+# get_image_url
+def get_image_url(product_page_soup):
+
+    print('Locating image container...')
+    image_parent = product_page_soup.find('div', class_ = 'swiper-wrapper') # find parent of image
+    if image_parent == None:
+        print('No container found')
+        return None
+    print('Matching ontainer found')
+
+    print('Locating image...')
+    image = image_parent.find('img') # find image from parent
+    print('Searching image src...')
+    src = image.get('src') # Search for src
+    if src == None:
+        print('Src not found')
+        return None
+    image_url = return_img_url(src) # extract src and combine to form url
+    if image_url == None:
+        print('No image found')
+        return None
+
+    print('Return image')
+    return image_url 
+
+# get_title_text
+def get_title_text(product_page_soup):
+    print('Locating title...')
+    try:
+        return product_page_soup.find('h1').get_text(strip = True) # locate title, and return stripped text content
+    except:
+        None
+
+def get_measurement(title):
+    try:
+        return regex.search(r'(\d+\s?г|\d+\s?кг|\d+\s?мл|\d+\s?л)', title).group(1)
+    except:
+        return None
+
+# get_description_dictionary
+def get_description_dictionary(product_page_soup):
+    # product_description -> find all product-features__item -> return product-features__prop + product-features__val
+    print('Identifying product_description...')
+    product_description = product_page_soup.find('div', class_ = 'product-page__description')
+    if product_description == None:
+        print('Description not found')
+        return {}
+    product_description_items = product_description.find_all('div', class_ = 'product-features__item')
+
+    print('Number of description found: ' + str(len(product_description_items)))
+    print('Saving description do dictionary')
+
+    product_description_dictionary = {} # Create empty dictionary
+
+    # Iterate all items
+    for product_description_item in product_description_items:
+
+        # Find key and value
+        Key = product_description_item.find('div', class_ = 'product-features__prop').get_text(strip=True)
+        Value = product_description_item.find('div', class_ = 'product-features__val').get_text(strip=True)
+
+        # Check if there is 'producer' value is location or name
+        if Key == 'Производитель':
+            if len(regex.findall(r'\s*', Value)) > 2 and len(regex.findall('[,.]', Value)) > 2:
+                Key = 'Производитель (地址)'
+
+
+        # Save to dic
+        product_description_dictionary[Key] = Value
+        # print('Saved ' + f'[{Key}: {Value}]')
+
+    return product_description_dictionary
+
+def get_category_name(name):
+    # 定义链接到中文的映射表
+    category_map = {
+        "cross-food": "混合食品",
+        "ovoshchi-frukty-i-yagody": "蔬菜水果和浆果",
+        "khleb-i-vypechka": "面包和烘焙品",
+        "molochnaya-produktsiya-i-yaytsa": "乳制品与鸡蛋",
+        "myaso-ptitsa-i-kolbasy": "肉类禽类与香肠",
+        "ryba-ikra-i-moreprodukty": "鱼类鱼子酱与海鲜",
+        "voda-soki-i-napitki": "水果汁与饮料",
+        "chipsy-sneki-sukhariki-i-popkorn": "薯片零食脆饼与爆米花",
+        "chay-kofe-i-kakao": "茶咖啡与可可",
+        "sladosti-i-deserty": "糖果与甜点",
+        "zdorovoe-pitanie": "健康饮食",
+        "bakaleya2": "杂货",
+        "konservy-salaty-ketchupy-i-sousy": "罐头沙拉番茄酱与调味料",
+        "zamorozhennye-produkty": "冷冻食品",
+        "detskoe-pitanie": "婴幼儿食品",
+        "zootovary": "宠物用品"
+    }
+
+    return category_map.get(name.strip(), "未知分类")
+
+def p24crawler():
+    while not link_queue.empty():
+
+        # get link
+        print('Retrieving link file...')
+        link_file = link_queue.get()
+
+        # Separator
+        print('===================================================================')
+
+        # Create dataframe
+        print('Initializing dataframe...')
+        dataframe = pandas.DataFrame()
+
+        # open link file to read product links
+        with open(os.path.join(FOLDER_PATH, link_file), 'r', encoding='utf-8') as product_links_file:
+
+            filename_only = os.path.splitext(os.path.basename(product_links_file.name))[0]
+            print('Opening file ' + filename_only + '...')
+            print('Identifying food category...')
+            category = get_category_name(filename_only)
+            print(category)
+
+            # Iterate though all lines in the file
+            for index, incomplete_product_page_link in enumerate(product_links_file):
+
+                # separator
+                print('-------------------------------------------------------------------')
+
+                # Process link format 
+                product_page_link = r'https://p24.by' + incomplete_product_page_link.strip()
+                # product_page_link = r'https://p24.by/product/26738-postnaya-perlovka-so-svezhimi-shampinonami-1kg-belarus/' # debugging option
+
+                # Requesting from product link
+                print('Performing scraping on product #' + str(index))
+                print('Requesting from ' + product_page_link)
+                try:
+                    product_response = requests.get(product_page_link, headers=headers) 
+                except:
+                    print('Error, invalid link, skipping...')
+                    continue
+
+                # 404 handling
+                if product_response.status_code == 404:
+                    print("404 Error: Page not found.")
+                    continue
+
+                # parse
+                product_html = product_response.text
+                print('Requested')
+                print('Parsing...')
+                product_page_soup = BeautifulSoup(product_html, 'html.parser')
+                print('Parsed, scraping...')
+
+                # Retrieve date using pre defined function
+                print('Extracting title...')
+                title = get_title_text(product_page_soup)
+                if title == 'Каталог':
+                    print('Page empty, skipping...')
+                    continue
+                print('Extracting quantity...')
+                measurement = get_measurement(title)
+                print('Extracting image url...')
+                image_url = get_image_url(product_page_soup)
+                
+                # Create top of dictionary
+                print('Creating top of dict...')
+                item_dict_top = {
+                    '产品链接': product_page_link,
+                    '产品名': title,
+                    '质量/容量': measurement,
+                    '图片URL': image_url
+                }
+                print('Top of dict complete')
+
+                # 上下拼接，保留所有列（join='outer' 是默认值）
+                # item_dataframe = pandas.DataFrame(get_description_dictionary(product_page_soup))
+                # dataframe = pandas.concat([dataframe, item_dataframe], ignore_index=True)
+                print('Scraping item description for bot of dic...')
+                item_dict_bottom = get_description_dictionary(product_page_soup)
+                print('Scraped, merging dic...')
+                item_dict = item_dict_top | item_dict_bottom # Merge top and bot dict
+
+                # check dic validity
+                if not item_dict:
+                    print("Dictionary is empty, skipping...")
+                    continue
+                if item_dict and all(v is None for v in item_dict.values()):
+                    print("Dictionary is not empty and all values are None, skipping...")
+                    continue
+
+                print('Merged, transfering data to dataframe from dic...')
+                item_dataframe = pandas.DataFrame([item_dict])  # 包裹成列表，防止 scalar 错误
+                dataframe = pandas.concat([dataframe, item_dataframe], ignore_index=True)
+                print('Data transfered')
+
+                print('-------------------------------------------------------------------')
+                # exit() # debugging option
+
+        print(f'All product info in file {category} saved to dataframe')
+        print('Exporting dataframe to xlsx...')
+        dataframe.to_excel(FILE_SAVE_PATH + '\\' + category + '.xlsx',index=False)
+        print(f'{category}: Exported dataframe to xlsx')
+        print('===================================================================')
+
+if not os.path.exists(FILE_SAVE_PATH):
+        print(f"{FILE_SAVE_PATH} Does not exist")
+        exit(1)
+
+# create queue to store all link files
+link_queue = Queue()
+for link_file in os.listdir(FOLDER_PATH):
+    link_queue.put(link_file)
+
+for i in range(2):
+    thread = Thread(target=p24crawler)
+    thread.start()
+    print('thread created')
+
+print('All pages completed, exit program')
+
+Respecting Robots.txt in Product Page Crawler.py
+import requests
+from concurrent.futures import ThreadPoolExecutor
+import regex
+from bs4 import BeautifulSoup
+import pandas as pd
+import os
+from urllib.parse import urlparse, urljoin
+
+# Function to check if a URL is allowed by robots.txt
+def is_allowed_by_robots(url, user_agent='*'):
+    parsed_url = urlparse(url)
+    base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    robots_url = urljoin(base_url, '/robots.txt')
+    
+    try:
+        response = requests.get(robots_url, timeout=10)
+        response.raise_for_status()
+        robots_content = response.text.splitlines()
+        
+        allow_rules = []
+        disallow_rules = []
+        
+        for line in robots_content:
+            line = line.strip()
+            if line.startswith('User-agent:'):
+                current_user_agent = line.split(': ')[1].strip()
+            elif line.startswith('Allow:') and current_user_agent == user_agent:
+                allow_rules.append(line.split(': ')[1].strip())
+            elif line.startswith('Disallow:') and current_user_agent == user_agent:
+                disallow_rules.append(line.split(': ')[1].strip())
+        
+        # Check against disallow rules
+        for rule in disallow_rules:
+            if rule.endswith('$'):
+                if url == urljoin(base_url, rule[:-1]):
+                    return False
+            elif rule.endswith('*'):
+                if url.startswith(urljoin(base_url, rule[:-1])):
+                    return False
+            else:
+                if url == urljoin(base_url, rule):
+                    return False
+        
+        # Check against allow rules
+        for rule in allow_rules:
+            if rule.endswith('$'):
+                if url == urljoin(base_url, rule[:-1]):
+                    return True
+            elif rule.endswith('*'):
+                if url.startswith(urljoin(base_url, rule[:-1])):
+                    return True
+            else:
+                if url == urljoin(base_url, rule):
+                    return True
+        
+        # Default to disallow if no specific rule matches
+        return len(disallow_rules) == 0
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching robots.txt: {e}")
+        return False
+
+# Amend src to get working URL
+def return_img_url(original_src):
+    try:
+        image_suffix = regex.search(r'upload\/(.*)', original_src).group(1)  # Extract suffix
+        image_url = 'https://p24.by/upload/' + image_suffix
+        return image_url  # Combine to form working URL
+    except Exception as e:
+        print(f'Error processing image URL: {e}')
+        return None
+
+# Get image URL
+def get_image_url(product_page_soup):
+    image_parent = product_page_soup.find('div', class_='swiper-wrapper')  # Find parent of image
+    if image_parent is None:
+        print('No container found')
+        return None
+
+    image = image_parent.find('img')  # Find image from parent
+    src = image.get('src') if image else None  # Search for src
+    if src is None:
+        print('Src not found')
+        return None
+
+    image_url = return_img_url(src)  # Extract src and combine to form URL
+    if image_url is None:
+        print('No image found')
+        return None
+
+    return image_url
+
+# Get title text
+def get_title_text(product_page_soup):
+    try:
+        return product_page_soup.find('h1').get_text(strip=True)  # Locate title and return stripped text content
+    except AttributeError:
+        return None
+
+def get_measurement(title):
+    try:
+        return regex.search(r'(\d+\s?г|\d+\s?кг|\d+\s?мл|\d+\s?л)', title).group(1)
+    except AttributeError:
+        return None
+
+# Get description dictionary
+def get_description_dictionary(product_page_soup):
+    product_description = product_page_soup.find('div', class_='product-page__description')
+    if product_description is None:
+        print('Description not found')
+        return {}
+
+    product_description_items = product_description.find_all('div', class_='product-features__item')
+
+    product_description_dictionary = {}  # Create empty dictionary
+
+    for product_description_item in product_description_items:
+        key_div = product_description_item.find('div', class_='product-features__prop')
+        value_div = product_description_item.find('div', class_='product-features__val')
+
+        if key_div and value_div:
+            Key = key_div.get_text(strip=True)
+            Value = value_div.get_text(strip=True)
+
+            if Key == 'Производитель':
+                if len(regex.findall(r'\s*', Value)) > 2 and len(regex.findall('[,.]', Value)) > 2:
+                    Key = 'Производитель (адрес)'
+
+            product_description_dictionary[Key] = Value
+
+    return product_description_dictionary
+
+def get_category_name(name):
+    category_map = {
+        "cross-food": "混合食品",
+        "ovoshchi-frukty-i-yagody": "蔬菜水果和浆果",
+        "khleb-i-vypechka": "面包和烘焙品",
+        "molochnaya-produktsiya-i-yaytsa": "乳制品与鸡蛋",
+        "myaso-ptitsa-i-kolbasy": "肉类禽类与香肠",
+        "ryba-ikra-i-moreprodukty": "鱼类鱼子酱与海鲜",
+        "voda-soki-i-napitki": "水果汁与饮料",
+        "chipsy-sneki-sukhariki-i-popkorn": "薯片零食脆饼与爆米花",
+        "chay-kofe-i-kakao": "茶咖啡与可可",
+        "sladosti-i-deserty": "糖果与甜点",
+        "zdorovoe-pitanie": "健康饮食",
+        "bakaleya2": "杂货",
+        "konservy-salaty-ketchupy-i-sousy": "罐头沙拉番茄酱与调味料",
+        "zamorozhennye-produkty": "冷冻食品",
+        "detskoe-pitanie": "婴幼儿食品",
+        "zootovary": "宠物用品"
+    }
+
+    return category_map.get(name.strip(), "未知分类")
+
+def fetch_product_data(session, product_page_link):
+    if not is_allowed_by_robots(product_page_link):
+        print(f'Skipping disallowed URL: {product_page_link}')
+        return None
+
+    try:
+        response = session.get(product_page_link, timeout=10)
+        response.raise_for_status()
+        product_html = response.text
+        product_page_soup = BeautifulSoup(product_html, 'html.parser')
+
+        title = get_title_text(product_page_soup)
+        if title == 'Каталог':
+            print('Page empty, skipping...')
+            return None
+
+        measurement = get_measurement(title)
+        image_url = get_image_url(product_page_soup)
+
+        item_dict_top = {
+            '产品链接': product_page_link,
+            '产品名': title,
+            '质量/容量': measurement,
+            '图片URL': image_url
+        }
+
+        item_dict_bottom = get_description_dictionary(product_page_soup)
+        item_dict = item_dict_top | item_dict_bottom
+
+        if not item_dict or all(v is None for v in item_dict.values()):
+            print("Dictionary is empty or all values are None, skipping...")
+            return None
+
+        return item_dict
+
+    except requests.exceptions.RequestException as e:
+        print(f'Error requesting {product_page_link}: {e}')
+        return None
+
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"
+}
+
+FILE_SAVE_PATH = r'D:\VSCode Folder\python\healthhope\p24.by crawler\product page crawler'
+FOLDER_PATH = r'D:\VSCode Folder\python\healthhope\p24.by crawler\product page crawler\all links cleaned'
+
+if not os.path.exists(FILE_SAVE_PATH):
+    print(f"{FILE_SAVE_PATH} does not exist")
+    exit(1)
+
+all_dataframes = []
+
+with requests.Session() as session:
+    session.headers.update(headers)
+
+    for link_file in os.listdir(FOLDER_PATH):
+        print('===================================================================')
+
+        with open(os.path.join(FOLDER_PATH, link_file), 'r', encoding='utf-8') as product_links_file:
+            filename_only = os.path.splitext(link_file)[0]
+            print(f'Opening file {filename_only}...')
+            print('Identifying food category...')
+            category = get_category_name(filename_only)
+            print(category)
+
+            products_data = []
+            product_links = [f'https://p24.by{line.strip()}' for line in product_links_file]
+
+            with ThreadPoolExecutor(max_workers=10) as executor:
+                results = list(executor.map(lambda link: fetch_product_data(session, link), product_links))
+
+            for result in results:
+                if result:
+                    products_data.append(result)
+
+        if products_data:
+            dataframe = pd.DataFrame(products_data)
+            all_dataframes.append((category, dataframe))
+
+        print(f'All product info in file {category} collected.')
+        print('===================================================================')
+
+for category, dataframe in all_dataframes:
+    filepath = os.path.join(FILE_SAVE_PATH, f'{category}.xlsx')
+    dataframe.to_excel(filepath, index=False)
+    print(f'{category}: Exported dataframe to xlsx')
+
+
+
+deplicate remover.py
+import os
+import pandas as pd
+
+def remove_duplicates_from_csv_folder(folder_path, overwrite=True):
+    """
+    遍历指定文件夹中的所有 .csv 文件，并删除重复行。
+    
+    参数:
+        folder_path (str): 包含 CSV 文件的文件夹路径
+        overwrite (bool): 是否覆盖原始文件，默认是；否则保存为 _deduplicated.csv
+    """
+    for filename in os.listdir(folder_path):
+        if filename.endswith('.csv'):
+            file_path = os.path.join(folder_path, filename)
+            
+            try:
+                # 使用 pandas 读取 CSV
+                df = pd.read_csv(file_path)
+
+                # 删除重复行（保留第一次出现）
+                df.drop_duplicates(inplace=True)
+
+                # 构造输出路径
+                if overwrite:
+                    output_path = file_path
+                else:
+                    name, ext = os.path.splitext(filename)
+                    output_path = os.path.join(folder_path, f"{name}_deduplicated{ext}")
+
+                # 写回 CSV 文件
+                df.to_csv(output_path, index=False)
+                print(f"Processed: {filename}")
+            except Exception as e:
+                print(f"Error processing {filename}: {e}")
+
+# 示例用法：
+folder_path = r'D:\VSCode Folder\python\healthhope\p24.by crawler\p24.by artifacts\all'  # 替换为你的实际文件夹路径
+remove_duplicates_from_csv_folder(folder_path, overwrite=True)
+
+link processor.py
+def add_base_url(input_file, output_file, base_url):
+    with open(input_file, 'r', encoding='utf-8') as infile:
+        lines = infile.readlines()
+
+    # 去除每行的换行符，并拼接基础URL
+    full_urls = [base_url + line.strip() + '\n' for line in lines]
+
+    with open(output_file, 'w', encoding='utf-8') as outfile:
+        outfile.writelines(full_urls)
+
+# 使用示例
+input_file = r'D:\VSCode Folder\python\healthhope\p24.by crawler\p24.by artifacts\bakaleya2\bakaleya2.csv'
+output_file = r'D:\VSCode Folder\python\healthhope\p24.by crawler\p24.by artifacts\bakaleya2\bakaleya2_links.csv'
+base_url = 'https://p24.by'
+
+add_base_url(input_file, output_file, base_url)
+
+remove invalid links.py
+import os
+
+# 设置文件夹路径
+INPUT_FOLDER = r'D:\VSCode Folder\python\healthhope\p24.by crawler\product page crawler\all links'     # 输入文件夹（含原始 .txt 文件）
+OUTPUT_FOLDER = r'D:\VSCode Folder\python\healthhope\p24.by crawler\product page crawler\all links cleaned'   # 输出文件夹（保存清洗后的文件）
+
+# 自动创建输出文件夹（如果不存在）
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+
+# 清洗函数
+def clean_links(lines):
+    return [line.strip() for line in lines if line.strip() not in ('', '/product/')]
+
+# 遍历输入文件夹中的所有 .txt 文件
+for filename in os.listdir(INPUT_FOLDER):
+    if filename.endswith('.csv'):
+        input_path = os.path.join(INPUT_FOLDER, filename)
+        output_path = os.path.join(OUTPUT_FOLDER, filename)
+
+        with open(input_path, 'r', encoding='utf-8') as f:
+            raw_lines = f.readlines()
+
+        cleaned_lines = clean_links(raw_lines)
+
+        with open(output_path, 'w', encoding='utf-8') as f:
+            for line in cleaned_lines:
+                f.write(line + '\n')
+
+        print(f"✅ 已处理并保存: {filename} （共 {len(cleaned_lines)} 条有效链接）")
+
+Anti-Crawler Detection Script.py
+import requests
+
+def test_anti_crawling(url):
+    # Define a generic User-Agent
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"
+    }
+
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+
+        print(f"Status Code: {response.status_code}")
+        print(f"Response Headers: {response.headers}")
+
+        # Check for specific headers indicating rate limiting
+        if 'X-RateLimit-Limit' in response.headers or 'X-RateLimit-Remaining' in response.headers:
+            print("Rate limiting detected.")
+
+        # Check for CAPTCHA-like content
+        if 'captcha' in response.text.lower():
+            print("CAPTCHA detected.")
+
+        # Check for robots.txt restrictions
+        robots_url = f"https://{url.split('//')[1].split('/')[0]}/robots.txt"
+        robots_response = requests.get(robots_url, headers=headers, timeout=10)
+        if robots_response.ok and 'Disallow:' in robots_response.text:
+            print("Disallowed paths found in robots.txt:")
+            print(robots_response.text)
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except requests.exceptions.RequestException as err:
+        print(f"Other error occurred: {err}")
+
+# Example usage
+test_anti_crawling('https://example.com')
+
+The following is the scraper for bytedance JD. It is not written during healthhope. You can include it's technical nuance in the project description to increase its richness.
+
+bytedance_jd_scraper.py
+from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
+import json
+import time
+
+def clean_html(raw_html):
+    """Uses BeautifulSoup only to remove HTML tags from the API text."""
+    if not raw_html: return ""
+    return BeautifulSoup(raw_html, "lxml").get_text(separator=" ")
+
+def run_pipeline():
+    # Your ByteIntern filter URL
+    url = "https://jobs.bytedance.com/campus/position?keywords=&category=&location=&project=7194661126919358757&type=&job_hot_flag=&current=1&limit=10"
+    
+    all_jobs = []
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context()
+        page = context.new_page()
+
+        # STEP 1: Listen for the JSON data packets
+        def capture_json(response):
+            if "/api/v1/search/job/posts" in response.url:
+                payload = response.json()
+                jobs = payload.get('data', {}).get('job_post_list', [])
+                for job in jobs:
+                    # STEP 2: Clean the JSON text with BeautifulSoup
+                    full_text = f"{job['title']} {clean_html(job['description'])} {clean_html(job['requirement'])}"
+                    
+                    all_jobs.append({
+                        "title": job['title'],
+                        "raw_text": full_text,
+                        "link": f"https://jobs.bytedance.com/campus/position/{job['id']}/detail"
+                    })
+
+        page.on("response", capture_json)
+        page.goto(url)
+        page.wait_for_timeout(3000)
+
+        # STEP 3: Automate pagination
+        # Based on your screenshot, there are 573 jobs (58 pages)
+        for i in range(2, 59):  # Testing first 10 pages as per your plan
+            print(f"Triggering API for Page {i}...")
+            # We find the pager button by text and click it
+            try:
+                page.get_by_role("listitem").get_by_text(str(i), exact=True).click()
+                page.wait_for_timeout(2000) # Wait for API to fire
+            except:
+                break 
+
+        browser.close()
+
+    # STEP 4: Save for fitting
+    with open('bytedance_raw_dump.json', 'w', encoding='utf-8') as f:
+        json.dump(all_jobs, f, ensure_ascii=False, indent=4)
+
+if __name__ == "__main__":
+    run_pipeline()
+
+json_clean.py
+import re
+import json
+
+def process_raw_dump(input_data):
+    processed_list = []
+    
+    # Anchor for the start of Requirements: "1、2027届" or "1、2026届"
+    req_anchor = r"1、202\d届"
+
+    for item in input_data:
+        title = item.get("title", "")
+        raw_text = item.get("raw_text", "")
+        link = item.get("link", "")
+        
+        # 1. Locate the Requirements section
+        req_match = re.search(req_anchor, raw_text)
+        
+        if req_match:
+            # Requirements is everything from the anchor to the end
+            requirements = raw_text[req_match.start():].strip()
+            
+            # 2. Extract Responsibilities from the text BEFORE the anchor
+            # We strip out the Title and the Team Intro
+            pre_req_text = raw_text[:req_match.start()]
+            
+            # Bytedance JDs usually have a double newline before the numbered list of duties
+            # We look for the first "1、" that isn't the graduation requirement
+            resp_match = re.search(r"\n\n1、(.*)", pre_req_text, re.S)
+            
+            if resp_match:
+                responsibilities = "1、" + resp_match.group(1).strip()
+            else:
+                # Fallback if the \n\n1、 pattern fails
+                responsibilities = pre_req_text.split("团队介绍：")[-1].strip()
+        else:
+            requirements = "Manual check required"
+            responsibilities = raw_text
+
+        processed_list.append({
+            "title": title,
+            "responsibilities": responsibilities,
+            "requirements": requirements,
+            "link": link
+        })
+        
+    return processed_list
+
+# Usage
+with open('bytedance_raw_dump.json', 'r', encoding='utf-8') as f:
+    raw_dump = json.load(f)
+
+cleaned = process_raw_dump(raw_dump)
+
+with open('bytedance_cleaned_dump.json', "w", encoding='utf-8') as json_file:
+    json.dump(cleaned, json_file, indent=4, ensure_ascii=False)
+
+json_filter.py
+import re
+import json
+
+def filter_dump(input_data):
+    filtered_list = []
+
+    """
+    1. Filter for undergrad
+    2. Filter for Python, PyTorch, NLP, 微调, 数据处理
+    """
+    
+    req_anchor1 = r"本科"
+    req_anchor2 = r"Python|PyTorch|NLP|微调|数据处理"
+
+    for item in input_data:
+        title = item.get("title", "")
+        responsibilities = item.get("responsibilities", "")
+        requirements = item.get("requirements", "")
+        
+        # 1. Locate the Requirements section
+        req1_match = re.search(req_anchor1, requirements)
+        req2_match = re.search(req_anchor2, requirements) or re.search(req_anchor2, responsibilities)
+        
+        if req1_match and req2_match:
+            filtered_list.append(item)
+        
+    return filtered_list
+
+# Usage
+with open('bytedance_cleaned_dump.json', 'r', encoding='utf-8') as f:
+    raw_dump = json.load(f)
+
+filtered = filter_dump(raw_dump)
+
+with open('bytedance_filtered_dump.json', "w", encoding='utf-8') as json_file:
+    json.dump(filtered, json_file, indent=4, ensure_ascii=False)
+
